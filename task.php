@@ -1,0 +1,155 @@
+<?php
+require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/agents/ReviewerAuditorAgent.php';
+require_once __DIR__ . '/includes/agents/ProfileGeneratorAgent.php';
+require_login();
+$user = current_user();
+$pdo = db();
+
+$taskId = (int) ($_GET['id'] ?? 0);
+$stmt = $pdo->prepare('SELECT t.*, c.name AS category_name FROM tasks t JOIN task_categories c ON c.id = t.category_id WHERE t.id = ?');
+$stmt->execute([$taskId]);
+$task = $stmt->fetch();
+if (!$task) { flash('error', 'Studi kasus tidak ditemukan.'); redirect('tasks.php'); }
+
+$pageTitle = $task['title'];
+$errors = [];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user['role'] === 'siswa') {
+    if (!csrf_verify()) {
+        redirect('task.php?id=' . $taskId);
+    }
+    $code = $_POST['code_content'] ?? '';
+    $notes = trim($_POST['notes'] ?? '');
+    if (trim($code) === '') {
+        $errors[] = 'Kode tidak boleh kosong.';
+    } else {
+        $ins = $pdo->prepare('INSERT INTO submissions (task_id, user_id, language, code_content, notes, status) VALUES (?,?,?,?,?,\'submitted\')');
+        $ins->execute([$taskId, $user['id'], 'php', $code, $notes]);
+        $submissionId = (int) $pdo->lastInsertId();
+
+        $review = (new ReviewerAuditorAgent())->review($code, $task['case_brief']);
+        $pdo->prepare(
+            'INSERT INTO ai_reviews (submission_id, clean_code_score, security_score, efficiency_score, overall_score, summary, findings_json)
+             VALUES (?,?,?,?,?,?,?)'
+        )->execute([
+            $submissionId, $review['clean_code_score'], $review['security_score'], $review['efficiency_score'],
+            $review['overall_score'], $review['summary'], json_encode($review['findings'], JSON_UNESCAPED_UNICODE),
+        ]);
+        $pdo->prepare("UPDATE submissions SET status='reviewed' WHERE id = ?")->execute([$submissionId]);
+
+        $mode = $review['ai_assisted'] ? 'Claude AI' : 'heuristik lokal';
+        log_activity($user['id'], 'submission_reviewed', "\"{$task['title']}\" · skor {$review['overall_score']}/100 · mode: {$mode}");
+
+        (new ProfileGeneratorAgent())->regenerate($user['id']);
+
+        redirect('submission.php?id=' . $submissionId);
+    }
+}
+
+$mySubmission = null;
+if ($user['role'] === 'siswa') {
+    $s = $pdo->prepare('SELECT * FROM submissions WHERE task_id = ? AND user_id = ? ORDER BY submitted_at DESC LIMIT 1');
+    $s->execute([$taskId, $user['id']]);
+    $mySubmission = $s->fetch();
+}
+
+require __DIR__ . '/includes/header.php';
+?>
+
+<section class="max-w-5xl mx-auto px-6 py-10">
+  <!-- Back link -->
+  <a href="<?= APP_URL ?>/tasks.php" class="inline-flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--ink)] transition-colors mb-6">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="12" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Kembali ke Studi Kasus
+  </a>
+
+  <!-- Task Header -->
+  <div class="animate-fade-up">
+    <div class="flex items-center gap-2">
+      <span class="badge badge-info"><?= e($task['category_name']) ?></span>
+      <span class="flex items-center gap-1.5 text-[11px] font-medium text-[var(--muted)] capitalize">
+        <span class="w-1.5 h-1.5 rounded-full <?= $task['difficulty']==='mahir'?'bg-red-400':($task['difficulty']==='menengah'?'bg-neutral-400':'bg-neutral-400') ?>"></span>
+        <?= e($task['difficulty']) ?>
+      </span>
+    </div>
+    <h1 class="mt-3 text-2xl md:text-3xl font-bold tracking-tight"><?= e($task['title']) ?></h1>
+    <p class="mt-1 text-sm text-[var(--muted)]">Konteks industri: <?= e($task['industry_context'] ?: '-') ?></p>
+  </div>
+
+  <!-- Brief Card -->
+  <div class="mt-8 surface rounded-3xl p-8 animate-fade-up" style="animation-delay: 0.1s;">
+    <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: #f5f5f5; color: #0a0a0a;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-light)]">Brief dari Agent Task Issuer</p>
+    </div>
+    <p class="text-sm text-[var(--ink-light)] leading-relaxed whitespace-pre-line"><?= e($task['case_brief']) ?></p>
+
+    <?php if ($task['starter_code']): ?>
+    <div class="mt-6">
+      <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-light)] mb-3 flex items-center gap-2">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Kode Awal
+      </p>
+      <pre class="code-block"><?= e($task['starter_code']) ?></pre>
+    </div>
+    <?php endif; ?>
+  </div>
+
+  <?php if ($user['role'] === 'siswa'): ?>
+    <?php if ($mySubmission): ?>
+      <div class="mt-6 p-4 rounded-2xl border border-neutral-200 flex items-center justify-between animate-fade-up" style="background: #f5f5f5;">
+        <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: #f5f5f5; color: #0a0a0a;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <span class="text-sm text-neutral-700">Kamu sudah pernah mengirim solusi untuk studi kasus ini.</span>
+        </div>
+        <a href="<?= APP_URL ?>/submission.php?id=<?= $mySubmission['id'] ?>" class="link-accent text-sm shrink-0">Lihat hasil &rarr;</a>
+      </div>
+    <?php endif; ?>
+
+    <?php if ($errors): ?>
+      <div class="mt-6 p-4 rounded-xl border border-red-200 flex items-start gap-3" style="background: var(--danger-50);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
+        <div class="text-sm text-red-700">
+          <?php foreach ($errors as $err): ?><p><?= e($err) ?></p><?php endforeach; ?>
+        </div>
+      </div>
+    <?php endif; ?>
+
+    <!-- Submission Form -->
+    <form method="POST" class="mt-6 surface rounded-3xl p-8" id="submitForm">
+      <?= csrf_field() ?>
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--ink); color: white;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-light)]">Kirim Solusi Kamu</p>
+      </div>
+      <textarea name="code_content" rows="14" required class="code-editor w-full rounded-2xl px-5 py-4 text-xs focus:ring-2 focus:ring-neutral-300" style="background: var(--ink); color: #e2e8f0; border: 2px solid var(--ink-light);" placeholder="Tempel kode PHP kamu di sini..."><?= e($task['starter_code'] ?? '') ?></textarea>
+      <div class="mt-4">
+        <label>Catatan untuk reviewer <span class="text-[var(--muted-light)] font-normal">(opsional)</span></label>
+        <textarea name="notes" rows="2" placeholder="Jelaskan pendekatan yang kamu ambil…"></textarea>
+      </div>
+      <button type="submit" id="submitBtn" class="btn btn-dark mt-5 px-8">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Kirim untuk Diaudit Agent Reviewer
+      </button>
+    </form>
+    <script>
+      document.getElementById('submitForm').addEventListener('submit', function () {
+        var btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin"><circle cx="12" cy="12" r="10" stroke-dasharray="31.4" stroke-dashoffset="10"/></svg> Agent Reviewer sedang mengaudit kode kamu…';
+        btn.classList.add('opacity-70');
+      });
+    </script>
+  <?php endif; ?>
+</section>
+
+<?php require __DIR__ . '/includes/footer.php'; ?>

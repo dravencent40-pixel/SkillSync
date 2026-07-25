@@ -1,0 +1,12 @@
+# Konfigurasi berisi API key & kredensial DB — JANGAN pernah di-commit
+config/config.php
+
+# Upload user (CV dsb) — data pribadi, tidak perlu masuk repo
+uploads/cvs/*
+!uploads/cvs/.gitkeep
+
+# File lokal umum
+*.log
+.env
+.DS_Store
+Thumbs.db
