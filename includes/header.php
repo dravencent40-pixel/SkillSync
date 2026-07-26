@@ -19,6 +19,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     colors: {
       ink: { DEFAULT: '#0a0a0a', light: '#171717' },
       muted: { DEFAULT: '#525252', light: '#737373' },
+      accent: { DEFAULT: '#2563eb', light: '#3b82f6', dark: '#1d4ed8', 50: '#eff6ff', 100: '#dbeafe' },
     },
     fontFamily: { sans: ['Outfit','sans-serif'], mono: ['JetBrains Mono','monospace'] },
     borderRadius: { '3xl': '2rem' },
@@ -30,15 +31,15 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 <header id="mainHeader" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" style="background: rgba(250,250,250,0.95); border-bottom: 1px solid rgba(229,229,229,0.6);">
   <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
     <a href="<?= APP_URL ?>/index.php" class="flex items-center gap-3 shrink-0 group">
-      <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm transition-transform duration-300 group-hover:scale-110" style="background: var(--gradient-dark); box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+      <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm transition-transform duration-300 group-hover:scale-110" style="background: var(--gradient-accent); box-shadow: 0 2px 10px rgba(37,99,235,0.35);">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       </div>
-      <span class="font-bold tracking-tight text-lg hidden sm:block">SkillSync <span class="text-neutral-500">AI</span></span>
+      <span class="font-bold tracking-tight text-lg hidden sm:block">SkillSync <span class="text-accent">AI</span></span>
     </a>
 
     <?php $__aiMode = ai_mode(); ?>
-    <span class="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border" style="<?= $__aiMode['active'] ? 'background:#f5f5f5;color:#171717;border-color:#e5e5e5;' : 'background:#fffbeb;color:#92400e;border-color:#fde68a;' ?>">
-      <span class="w-1.5 h-1.5 rounded-full <?= $__aiMode['active'] ? 'bg-emerald-500' : 'bg-amber-500' ?> animate-pulse"></span>
+    <span class="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border" style="<?= $__aiMode['active'] ? 'background:#eff6ff;color:#1d4ed8;border-color:#dbeafe;' : 'background:#fffbeb;color:#92400e;border-color:#fde68a;' ?>">
+      <span class="w-1.5 h-1.5 rounded-full <?= $__aiMode['active'] ? 'bg-blue-500' : 'bg-amber-500' ?> animate-pulse"></span>
       <?= e($__aiMode['label']) ?>
     </span>
 

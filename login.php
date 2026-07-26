@@ -75,9 +75,9 @@ require __DIR__ . '/includes/header.php';
         <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Selamat datang kembali</h1>
         <p class="mt-2 text-sm text-[#525252]">Masuk untuk melanjutkan progres kamu.</p>
 
-        <div class="mt-6 p-4 rounded-xl border border-[#e5e5e5]" style="background: #f5f5f5;">
+        <div class="mt-6 p-4 rounded-xl border border-accent-100" style="background: var(--accent-50);">
           <div class="flex items-center gap-2 mb-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
             <span class="text-xs font-semibold">Akun Demo</span>
           </div>
           <div class="space-y-1 text-xs text-[#525252]">

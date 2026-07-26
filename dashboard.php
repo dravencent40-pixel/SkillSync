@@ -59,8 +59,8 @@ require __DIR__ . '/includes/header.php';
           <circle class="progress" cx="50" cy="50" r="42" fill="none" stroke="url(#scoreGradient)" stroke-width="8" stroke-linecap="round"/>
           <defs>
             <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:#0a0a0a"/>
-              <stop offset="100%" style="stop-color:#525252"/>
+              <stop offset="0%" style="stop-color:#3b82f6"/>
+              <stop offset="100%" style="stop-color:#1d4ed8"/>
             </linearGradient>
           </defs>
         </svg>
@@ -77,23 +77,23 @@ require __DIR__ . '/includes/header.php';
 
     <!-- Metric Strips -->
     <div class="lg:col-span-2 surface p-8 rounded-3xl grid grid-cols-3 gap-4">
-      <div class="text-center p-4 rounded-2xl transition-all duration-200 hover:bg-[#f5f5f5]">
-        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: #f5f5f5;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      <div class="text-center p-4 rounded-2xl transition-all duration-200 hover:bg-[var(--accent-50)]">
+        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: var(--accent-50);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         </div>
         <p class="text-2xl font-extrabold <?= score_color_class((int)$profile['clean_code_avg']) ?>"><?= (int)$profile['clean_code_avg'] ?></p>
         <p class="text-xs text-[var(--muted)] mt-1 font-medium">Clean Code</p>
       </div>
-      <div class="text-center p-4 rounded-2xl transition-all duration-200 hover:bg-[#f5f5f5]">
-        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: #f5f5f5;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div class="text-center p-4 rounded-2xl transition-all duration-200 hover:bg-[var(--success-50)]">
+        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: var(--success-50);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <p class="text-2xl font-extrabold <?= score_color_class((int)$profile['security_avg']) ?>"><?= (int)$profile['security_avg'] ?></p>
         <p class="text-xs text-[var(--muted)] mt-1 font-medium">Keamanan</p>
       </div>
-      <div class="text-center p-4 rounded-2xl transition-all duration-200 hover:bg-[#f5f5f5]">
-        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: #f5f5f5;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <div class="text-center p-4 rounded-2xl transition-all duration-200 hover:bg-[var(--warning-50)]">
+        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: var(--warning-50);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </div>
         <p class="text-2xl font-extrabold <?= score_color_class((int)$profile['efficiency_avg']) ?>"><?= (int)$profile['efficiency_avg'] ?></p>
         <p class="text-xs text-[var(--muted)] mt-1 font-medium">Efisiensi</p>
@@ -216,7 +216,7 @@ require __DIR__ . '/includes/header.php';
   <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 stagger">
     <div class="stat-card group">
       <div class="flex items-center justify-between mb-4">
-        <div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style="background: #f5f5f5; color: #0a0a0a;">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style="background: var(--accent-50); color: var(--accent);">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
         </div>
       </div>
@@ -226,7 +226,7 @@ require __DIR__ . '/includes/header.php';
 
     <div class="stat-card group">
       <div class="flex items-center justify-between mb-4">
-        <div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style="background: #f5f5f5; color: #525252;">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style="background: var(--success-50); color: var(--success);">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
         </div>
       </div>
@@ -236,7 +236,7 @@ require __DIR__ . '/includes/header.php';
 
     <div class="stat-card group">
       <div class="flex items-center justify-between mb-4">
-        <div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style="background: #f5f5f5; color: #525252;">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style="background: var(--warning-50); color: var(--warning);">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
       </div>
