@@ -27,6 +27,7 @@ function is_logged_in(): bool
 function require_login(): void
 {
     if (!is_logged_in()) {
+        $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'] ?? null;
         flash('error', 'Silakan masuk terlebih dahulu.');
         redirect('login.php');
     }

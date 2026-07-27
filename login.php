@@ -18,7 +18,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             unset($user['password_hash']);
             $_SESSION['user'] = $user;
             log_activity($user['id'], 'login', null);
-            redirect('dashboard.php');
+            $next = $_SESSION['redirect_after_login'] ?? null;
+            unset($_SESSION['redirect_after_login']);
+            if ($next) {
+                $basePath = parse_url(APP_URL, PHP_URL_PATH) ?? '';
+                if ($basePath && str_starts_with($next, $basePath)) {
+                    $next = substr($next, strlen($basePath));
+                }
+                $next = ltrim($next, '/');
+            }
+            redirect($next ?: 'dashboard.php');
         }
         $errors[] = 'Email atau password salah.';
     }
@@ -112,7 +121,7 @@ require __DIR__ . '/includes/header.php';
           </button>
         </form>
 
-        <p class="mt-6 text-center text-sm text-[#525252]">Jika lupa akses, hubungi admin.</p>
+        <p class="mt-6 text-center text-sm text-[#525252]">Belum punya akun? <a href="<?= APP_URL ?>/register.php" class="link-accent">Daftar di sini</a></p>
       </div>
     </div>
   </div>

@@ -90,7 +90,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <?php else: ?>
       <div class="flex items-center gap-3">
         <a href="<?= APP_URL ?>/login.php" class="btn btn-ghost btn-sm">Masuk</a>
-        <a href="<?= APP_URL ?>/upload_cv.php" class="btn btn-primary btn-sm">Unggah CV</a>
+        <a href="<?= APP_URL ?>/register.php" class="btn btn-primary btn-sm">Daftar</a>
       </div>
     <?php endif; ?>
   </div>

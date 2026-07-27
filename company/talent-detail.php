@@ -27,7 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $companyId) {
 }
 
 $stmt = $pdo->prepare(
-    'SELECT u.name, u.email, sp.*, s.jurusan, s.kelas, s.sekolah, s.bio, s.github_url
+    'SELECT u.name, u.email, sp.*, s.jurusan, s.kelas, s.sekolah, s.bio, s.github_url,
+            s.cv_path, s.cv_original_name, s.cv_uploaded_at
      FROM users u
      JOIN skill_profiles sp ON sp.user_id = u.id
      LEFT JOIN student_profiles s ON s.user_id = u.id
@@ -94,8 +95,8 @@ require __DIR__ . '/../includes/header.php';
           <circle class="progress" cx="50" cy="50" r="42" fill="none" stroke="url(#talentGradient)" stroke-width="8" stroke-linecap="round"/>
           <defs>
             <linearGradient id="talentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:#0a0a0a"/>
-              <stop offset="100%" style="stop-color:#525252"/>
+              <stop offset="0%" style="stop-color:#3b82f6"/>
+              <stop offset="100%" style="stop-color:#1d4ed8"/>
             </linearGradient>
           </defs>
         </svg>
@@ -156,10 +157,32 @@ require __DIR__ . '/../includes/header.php';
   </div>
   <?php endif; ?>
 
+  <!-- CV -->
+  <div class="mt-8 surface rounded-3xl p-8">
+    <div class="flex items-center gap-2 mb-4">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--accent-50); color: var(--accent);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-light)]">Curriculum Vitae</p>
+    </div>
+    <?php if ($talent['cv_path']): ?>
+      <div class="flex items-center justify-between gap-4 flex-wrap mb-4">
+        <div>
+          <p class="font-semibold text-sm text-[var(--ink)]"><?= e($talent['cv_original_name']) ?></p>
+          <p class="text-xs text-[var(--muted)]">Diunggah <?= time_ago($talent['cv_uploaded_at']) ?></p>
+        </div>
+        <a href="<?= APP_URL ?>/<?= e($talent['cv_path']) ?>" target="_blank" rel="noopener" class="btn btn-accent btn-sm">Buka di Tab Baru</a>
+      </div>
+      <iframe src="<?= APP_URL ?>/<?= e($talent['cv_path']) ?>" style="width:100%;height:500px;border:0;" class="rounded-2xl border border-[var(--border-light)]" title="Pratinjau CV"></iframe>
+    <?php else: ?>
+      <p class="text-sm text-[var(--muted)]">Talenta ini belum mengunggah CV.</p>
+    <?php endif; ?>
+  </div>
+
   <!-- Recruitment Status -->
   <div class="mt-8 surface rounded-3xl p-8">
     <div class="flex items-center gap-2 mb-4">
-      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: #f5f5f5; color: #0a0a0a;">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--accent-50); color: var(--accent);">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </div>
       <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-light)]">Status Rekrutmen</p>

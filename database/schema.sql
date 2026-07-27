@@ -27,14 +27,17 @@ CREATE TABLE users (
 -- 2. STUDENT_PROFILES — data tambahan khusus siswa SMK
 -- ---------------------------------------------------------------------
 CREATE TABLE student_profiles (
-    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id     INT UNSIGNED NOT NULL UNIQUE,
-    nis         VARCHAR(30)  DEFAULT NULL,
-    sekolah     VARCHAR(150) DEFAULT 'SMKN 9 Bekasi',
-    jurusan     VARCHAR(100) DEFAULT NULL,
-    kelas       VARCHAR(20)  DEFAULT NULL,
-    bio         TEXT         DEFAULT NULL,
-    github_url  VARCHAR(255) DEFAULT NULL,
+    id                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id           INT UNSIGNED NOT NULL UNIQUE,
+    nis               VARCHAR(30)  DEFAULT NULL,
+    sekolah           VARCHAR(150) DEFAULT 'SMKN 9 Bekasi',
+    jurusan           VARCHAR(100) DEFAULT NULL,
+    kelas             VARCHAR(20)  DEFAULT NULL,
+    bio               TEXT         DEFAULT NULL,
+    github_url        VARCHAR(255) DEFAULT NULL,
+    cv_path           VARCHAR(255) DEFAULT NULL COMMENT 'path relatif file CV milik siswa ini',
+    cv_original_name  VARCHAR(255) DEFAULT NULL,
+    cv_uploaded_at    DATETIME     DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

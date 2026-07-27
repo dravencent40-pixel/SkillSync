@@ -13,10 +13,7 @@
         <p class="mt-4 text-sm text-[#525252] leading-relaxed max-w-md">
           Platform asesmen teknis berbasis AI yang mengotomatisasi penilaian studi kasus industri, menyediakan mentor interaktif, serta menyajikan profil kompetensi transparan.
         </p>
-        <div class="mt-5 flex items-center gap-3">
-          <span class="badge badge-accent">Lomba AI Agent Innovation</span>
-          <span class="badge badge-info">Goodeva Technology</span>
-        </div>
+        
       </div>
       <div class="md:col-span-3 md:col-start-7">
         <h4 class="text-xs font-bold uppercase tracking-wider text-[#a3a3a3] mb-4">Platform</h4>
@@ -44,7 +41,7 @@
     <hr class="my-8 divider">
     <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
       <p class="text-xs text-[#a3a3a3]">&copy; <?= date('Y') ?> SkillSync AI. All rights reserved.</p>
-      <p class="text-xs text-[#a3a3a3]">Powered by Groq (Llama 3.3)</p>
+      
     </div>
   </div>
 </footer>
