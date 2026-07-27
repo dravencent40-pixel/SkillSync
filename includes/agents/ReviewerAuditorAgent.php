@@ -10,7 +10,7 @@ require_once __DIR__ . '/AIClient.php';
  * - efficiency_score  : query di dalam loop (N+1), perulangan tidak perlu
  *
  * Mode Hybrid: sekumpulan pemeriksaan keamanan deterministik (regex, presisi
- * tinggi) SELALU dijalankan, baik saat Claude tersedia maupun tidak. Ini
+ * tinggi) SELALU dijalankan, baik saat Groq tersedia maupun tidak. Ini
  * membuat temuan kritikal (SQLi, XSS, secret hardcoded) tidak bergantung
  * 100% pada penilaian LLM yang sifatnya probabilistik — setiap temuan diberi
  * label sumber ('static-verified' vs 'ai-judged') supaya siswa dan mitra
@@ -168,7 +168,7 @@ class ReviewerAuditorAgent
         }
 
         $overall = $this->weightedOverall($cleanScore, $securityScore, $efficiencyScore);
-        $summary = "Audit otomatis (mode heuristik lokal — belum tersambung ke Claude API) menilai kode ini dengan skor keseluruhan {$overall}/100. "
+        $summary = "Audit otomatis (mode heuristik lokal — belum tersambung ke Groq API) menilai kode ini dengan skor keseluruhan {$overall}/100. "
                  . "Fokus perbaikan utama: " . $this->topWeakArea($cleanScore, $securityScore, $efficiencyScore) . ".";
 
         return [

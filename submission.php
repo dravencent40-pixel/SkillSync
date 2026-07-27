@@ -45,12 +45,39 @@ require __DIR__ . '/includes/header.php';
       <h1 class="text-2xl md:text-3xl font-bold tracking-tight mt-1"><?= e($submission['task_title']) ?></h1>
     </div>
     <?php if ($user['role'] === 'siswa'): ?>
-    <a href="<?= APP_URL ?>/mentor.php?submission_id=<?= $submission['id'] ?>" class="btn btn-primary">
+    <a href="<?= APP_URL ?>/mentor.php?submission_id=<?= $submission['id'] ?>" class="btn btn-ghost">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Tanya Agent Mentor
     </a>
     <?php endif; ?>
   </div>
+
+  <?php
+  $defStmt = $pdo->prepare('SELECT * FROM defense_sessions WHERE submission_id = ?');
+  $defStmt->execute([$id]);
+  $defenseSession = $defStmt->fetch();
+  ?>
+  <?php if ($defenseSession && $user['role'] === 'siswa'): ?>
+    <div class="mt-6 surface p-5 rounded-2xl flex items-center justify-between gap-4 flex-wrap" style="border-color: var(--accent-100); background: var(--accent-50);">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl grid place-items-center shrink-0" style="background: white; color: var(--accent);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+        </div>
+        <div>
+          <p class="font-semibold text-sm text-[var(--ink)]">Sesi Pembelaan Project</p>
+          <p class="text-xs text-[var(--muted)]">
+            <?= $defenseSession['status'] === 'evaluated'
+                ? 'Selesai · skor pemahaman ' . (int)$defenseSession['comprehension_score'] . '/100'
+                : 'Wajib diselesaikan agar skor pemahamanmu ikut dihitung ke profil' ?>
+          </p>
+        </div>
+      </div>
+      <a href="<?= APP_URL ?>/defense.php?submission_id=<?= $id ?>" class="btn <?= $defenseSession['status'] === 'evaluated' ? 'btn-ghost' : 'btn-accent' ?> btn-sm">
+        <?= $defenseSession['status'] === 'evaluated' ? 'Lihat Hasil' : 'Mulai Sesi' ?>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" x2="19" y1="12" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  <?php endif; ?>
 
   <?php if (!$review): ?>
     <div class="mt-8 surface rounded-3xl p-12">
@@ -73,8 +100,8 @@ require __DIR__ . '/includes/header.php';
           <circle class="progress" cx="50" cy="50" r="42" fill="none" stroke="url(#submissionGradient)" stroke-width="8" stroke-linecap="round"/>
           <defs>
             <linearGradient id="submissionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:#0a0a0a"/>
-              <stop offset="100%" style="stop-color:#525252"/>
+              <stop offset="0%" style="stop-color:#3b82f6"/>
+              <stop offset="100%" style="stop-color:#1d4ed8"/>
             </linearGradient>
           </defs>
         </svg>
@@ -89,23 +116,23 @@ require __DIR__ . '/includes/header.php';
     </div>
 
     <div class="lg:col-span-2 surface p-8 rounded-3xl grid grid-cols-3 gap-4">
-      <div class="text-center p-4 rounded-2xl hover:bg-[#f5f5f5] transition-colors">
-        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: #f5f5f5;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      <div class="text-center p-4 rounded-2xl hover:bg-[var(--accent-50)] transition-colors">
+        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: var(--accent-50);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         </div>
         <p class="text-2xl font-extrabold <?= score_color_class((int)$review['clean_code_score']) ?>"><?= (int)$review['clean_code_score'] ?></p>
         <p class="text-xs text-[var(--muted)] mt-1 font-medium">Clean Code</p>
       </div>
-      <div class="text-center p-4 rounded-2xl hover:bg-[#f5f5f5] transition-colors">
-        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: #f5f5f5;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div class="text-center p-4 rounded-2xl hover:bg-[var(--success-50)] transition-colors">
+        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: var(--success-50);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <p class="text-2xl font-extrabold <?= score_color_class((int)$review['security_score']) ?>"><?= (int)$review['security_score'] ?></p>
         <p class="text-xs text-[var(--muted)] mt-1 font-medium">Keamanan</p>
       </div>
-      <div class="text-center p-4 rounded-2xl hover:bg-[#f5f5f5] transition-colors">
-        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: #f5f5f5;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <div class="text-center p-4 rounded-2xl hover:bg-[var(--warning-50)] transition-colors">
+        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: var(--warning-50);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </div>
         <p class="text-2xl font-extrabold <?= score_color_class((int)$review['efficiency_score']) ?>"><?= (int)$review['efficiency_score'] ?></p>
         <p class="text-xs text-[var(--muted)] mt-1 font-medium">Efisiensi</p>
@@ -142,7 +169,7 @@ require __DIR__ . '/includes/header.php';
             <?php if ($source === 'static-verified'): ?>
               <span class="badge badge-success" title="Ditemukan lewat pemeriksaan pola deterministik, bukan opini AI">✓ Verified</span>
             <?php else: ?>
-              <span class="badge badge-accent" title="Penilaian kualitatif dari Claude AI">AI Judgment</span>
+              <span class="badge badge-accent" title="Penilaian kualitatif dari Groq AI">AI Judgment</span>
             <?php endif; ?>
           </div>
           <p class="mt-1.5 text-sm text-[var(--muted)] leading-relaxed"><?= e($f['detail']) ?></p>

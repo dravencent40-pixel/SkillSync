@@ -148,6 +148,7 @@ CREATE TABLE skill_profiles (
     clean_code_avg    TINYINT UNSIGNED NOT NULL DEFAULT 0,
     security_avg      TINYINT UNSIGNED NOT NULL DEFAULT 0,
     efficiency_avg    TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    comprehension_avg TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'rata-rata skor sesi Agent Defense',
     tasks_completed    SMALLINT UNSIGNED NOT NULL DEFAULT 0,
     badge             ENUM('Pemula','Junior Ready','Job Ready','Top Talent') NOT NULL DEFAULT 'Pemula',
     strengths         VARCHAR(255) DEFAULT NULL,
@@ -174,7 +175,40 @@ CREATE TABLE recommendations (
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- 12. ACTIVITY_LOGS — audit trail ringan
+-- 12. DEFENSE_SESSIONS — sesi pembelaan project (Agent Defense, anti-cheat)
+-- Dibuat otomatis setiap kali submission selesai direview. Siswa wajib
+-- menjawab pertanyaan yang merujuk keputusan spesifik di kodenya sendiri
+-- sebelum skor pemahamannya (comprehension_score) ikut dihitung ke profil.
+-- ---------------------------------------------------------------------
+CREATE TABLE defense_sessions (
+    id                   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    submission_id        INT UNSIGNED NOT NULL UNIQUE,
+    status               ENUM('pending','answered','evaluated') NOT NULL DEFAULT 'pending',
+    comprehension_score  TINYINT UNSIGNED DEFAULT NULL,
+    feedback             TEXT DEFAULT NULL,
+    ai_assisted          TINYINT(1) NOT NULL DEFAULT 0,
+    created_at           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    answered_at          DATETIME DEFAULT NULL,
+    evaluated_at         DATETIME DEFAULT NULL,
+    FOREIGN KEY (submission_id) REFERENCES submissions(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- 13. DEFENSE_QUESTIONS — pertanyaan & jawaban per sesi pembelaan
+-- ---------------------------------------------------------------------
+CREATE TABLE defense_questions (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    session_id      INT UNSIGNED NOT NULL,
+    order_index     TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    question        TEXT NOT NULL,
+    answer          TEXT DEFAULT NULL,
+    answer_score    TINYINT UNSIGNED DEFAULT NULL,
+    answer_feedback TEXT DEFAULT NULL,
+    FOREIGN KEY (session_id) REFERENCES defense_sessions(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- 14. ACTIVITY_LOGS — audit trail ringan
 -- ---------------------------------------------------------------------
 CREATE TABLE activity_logs (
     id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

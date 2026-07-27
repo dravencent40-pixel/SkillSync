@@ -4,6 +4,7 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/agents/ReviewerAuditorAgent.php';
 require_once __DIR__ . '/includes/agents/ProfileGeneratorAgent.php';
+require_once __DIR__ . '/includes/agents/DefenseAgent.php';
 require_login();
 $user = current_user();
 $pdo = db();
@@ -40,8 +41,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user['role'] === 'siswa') {
         ]);
         $pdo->prepare("UPDATE submissions SET status='reviewed' WHERE id = ?")->execute([$submissionId]);
 
-        $mode = $review['ai_assisted'] ? 'Claude AI' : 'heuristik lokal';
+        $mode = $review['ai_assisted'] ? 'Groq AI' : 'heuristik lokal';
         log_activity($user['id'], 'submission_reviewed', "\"{$task['title']}\" · skor {$review['overall_score']}/100 · mode: {$mode}");
+
+        // --- Agent Defense: buat sesi pembelaan otomatis (anti-cheat) -----
+        // Siswa wajib menjawab pertanyaan yang merujuk kode/temuan spesifiknya
+        // sendiri sebelum skor pemahaman ikut membentuk profil kompetensinya.
+        $defenseAgent = new DefenseAgent();
+        $dq = $defenseAgent->generateQuestions($code, $task['case_brief'], $review['findings']);
+        $sessionIns = $pdo->prepare('INSERT INTO defense_sessions (submission_id, status, ai_assisted) VALUES (?, \'pending\', ?)');
+        $sessionIns->execute([$submissionId, $dq['ai_assisted'] ? 1 : 0]);
+        $sessionId = (int) $pdo->lastInsertId();
+        $qIns = $pdo->prepare('INSERT INTO defense_questions (session_id, order_index, question) VALUES (?,?,?)');
+        foreach ($dq['questions'] as $i => $q) {
+            $qIns->execute([$sessionId, $i, $q]);
+        }
 
         (new ProfileGeneratorAgent())->regenerate($user['id']);
 

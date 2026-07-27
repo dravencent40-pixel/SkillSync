@@ -44,7 +44,7 @@
     <hr class="my-8 divider">
     <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
       <p class="text-xs text-[#a3a3a3]">&copy; <?= date('Y') ?> SkillSync AI. All rights reserved.</p>
-      <p class="text-xs text-[#a3a3a3]">Powered by Anthropic Claude AI</p>
+      <p class="text-xs text-[#a3a3a3]">Powered by Groq (Llama 3.3)</p>
     </div>
   </div>
 </footer>

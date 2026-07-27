@@ -4,7 +4,7 @@
  *
  * Chatbot interaktif yang berperan sebagai mentor teknis: menjawab pertanyaan
  * siswa seputar bug/kodenya, memberi hint (bukan langsung jawaban jadi), dan
- * memberi semangat. Menggunakan Claude jika tersedia, atau logika
+ * memberi semangat. Menggunakan Groq jika tersedia, atau logika
  * pattern-matching lokal sebagai fallback.
  */
 class MentorAgent
