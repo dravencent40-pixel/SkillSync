@@ -52,12 +52,19 @@ CREATE TABLE company_profiles (
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- 4. TASK_CATEGORIES — kategori studi kasus (dipakai untuk skor per-bidang)
+-- 4. TASK_CATEGORIES — kategori studi kasus per divisi (dipakai untuk skor
+--    per-bidang). submission_type & rubric_criteria membuat sistem rubric-
+--    driven: kriteria & bentuk form submission menyesuaikan divisi
+--    (Programming/UI-UX Design/Jaringan/dst), bukan cuma untuk kode.
 -- ---------------------------------------------------------------------
 CREATE TABLE task_categories (
-    id    INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name  VARCHAR(60) NOT NULL UNIQUE,
-    slug  VARCHAR(60) NOT NULL UNIQUE
+    id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name             VARCHAR(60) NOT NULL UNIQUE,
+    slug             VARCHAR(60) NOT NULL UNIQUE,
+    submission_type  ENUM('code','design','network','general') NOT NULL DEFAULT 'code'
+                     COMMENT 'menentukan bentuk form submission & gaya evaluasi Agent Reviewer',
+    rubric_criteria  JSON DEFAULT NULL
+                     COMMENT '3 kriteria penilaian: [{"key":"...","label":"...","description":"..."}]'
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -86,8 +93,10 @@ CREATE TABLE submissions (
     id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     task_id        INT UNSIGNED NOT NULL,
     user_id        INT UNSIGNED NOT NULL,
-    language       VARCHAR(30)  NOT NULL DEFAULT 'php',
-    code_content   MEDIUMTEXT   NOT NULL,
+    language       VARCHAR(30)  NOT NULL DEFAULT 'php' COMMENT 'php/figma-link/network-config/dll, menyesuaikan submission_type kategori',
+    code_content   MEDIUMTEXT   NOT NULL COMMENT 'kode, ATAU deskripsi/dokumentasi untuk submission non-kode',
+    file_path      VARCHAR(255) DEFAULT NULL COMMENT 'path relatif file yang diunggah (screenshot desain, topologi, dll)',
+    external_link  VARCHAR(500) DEFAULT NULL COMMENT 'link eksternal, mis. Figma/dokumen',
     notes          TEXT         DEFAULT NULL COMMENT 'catatan siswa ke reviewer',
     status         ENUM('submitted','reviewed','revised') NOT NULL DEFAULT 'submitted',
     submitted_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -208,7 +217,31 @@ CREATE TABLE defense_questions (
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- 14. ACTIVITY_LOGS — audit trail ringan
+-- 15. SKILL_PROFILE_TRACKS — breakdown skor PER DIVISI (per kategori).
+-- skill_profiles menyimpan ringkasan lintas-divisi (untuk badge & pencarian
+-- talenta), tapi rata-rata di sana membaurkan kriteria yang beda makna antar
+-- kategori (mis. "Clean Code" vs "Hierarki Visual" sama-sama di slot
+-- criterion1). Tabel ini menyimpan rata-rata TERPISAH per kategori supaya
+-- dashboard siswa bisa menampilkan breakdown yang jujur per divisi.
+-- ---------------------------------------------------------------------
+CREATE TABLE skill_profile_tracks (
+    id                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id            INT UNSIGNED NOT NULL,
+    category_id        INT UNSIGNED NOT NULL,
+    overall_score      TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    criterion1_score   TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    criterion2_score   TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    criterion3_score   TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    comprehension_avg  TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'rata-rata skor Agent Defense KHUSUS kategori ini',
+    tasks_completed    SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    updated_at         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_user_category (user_id, category_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES task_categories(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- 16. ACTIVITY_LOGS — audit trail ringan
 -- ---------------------------------------------------------------------
 CREATE TABLE activity_logs (
     id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

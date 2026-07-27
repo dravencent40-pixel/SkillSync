@@ -10,3 +10,5 @@ uploads/cvs/*
 .env
 .DS_Store
 Thumbs.db
+uploads/submissions/*
+!uploads/submissions/.gitkeep

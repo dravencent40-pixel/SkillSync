@@ -4,11 +4,37 @@
 -- =====================================================================
 USE skillsync_ai;
 
-INSERT INTO task_categories (name, slug) VALUES
-('Web Development', 'web-development'),
-('Data & Backend', 'data-backend'),
-('Keamanan Aplikasi', 'keamanan-aplikasi'),
-('Mobile & UI', 'mobile-ui');
+INSERT INTO task_categories (name, slug, submission_type, rubric_criteria) VALUES
+('Web Development', 'web-development', 'code', JSON_ARRAY(
+    JSON_OBJECT('key','clean_code','label','Clean Code','description','Penamaan, struktur, komentar, konsistensi'),
+    JSON_OBJECT('key','security','label','Keamanan','description','SQL Injection, XSS, validasi input, secret hardcoded'),
+    JSON_OBJECT('key','efficiency','label','Efisiensi','description','Kompleksitas, query N+1, redundansi')
+)),
+('Data & Backend', 'data-backend', 'code', JSON_ARRAY(
+    JSON_OBJECT('key','clean_code','label','Clean Code','description','Penamaan, struktur, komentar, konsistensi'),
+    JSON_OBJECT('key','security','label','Keamanan','description','SQL Injection, XSS, validasi input, secret hardcoded'),
+    JSON_OBJECT('key','efficiency','label','Efisiensi','description','Kompleksitas, query N+1, redundansi')
+)),
+('Keamanan Aplikasi', 'keamanan-aplikasi', 'code', JSON_ARRAY(
+    JSON_OBJECT('key','clean_code','label','Clean Code','description','Penamaan, struktur, komentar, konsistensi'),
+    JSON_OBJECT('key','security','label','Keamanan','description','SQL Injection, XSS, validasi input, secret hardcoded'),
+    JSON_OBJECT('key','efficiency','label','Efisiensi','description','Kompleksitas, query N+1, redundansi')
+)),
+('Mobile & UI', 'mobile-ui', 'code', JSON_ARRAY(
+    JSON_OBJECT('key','clean_code','label','Clean Code','description','Penamaan, struktur, komentar, konsistensi'),
+    JSON_OBJECT('key','security','label','Keamanan','description','SQL Injection, XSS, validasi input, secret hardcoded'),
+    JSON_OBJECT('key','efficiency','label','Efisiensi','description','Kompleksitas, query N+1, redundansi')
+)),
+('UI/UX Design', 'ui-ux-design', 'design', JSON_ARRAY(
+    JSON_OBJECT('key','visual_hierarchy','label','Hierarki & Layout Visual','description','Alur mata, whitespace, tipografi, grid'),
+    JSON_OBJECT('key','design_consistency','label','Konsistensi Design System','description','Komponen reusable, spacing/warna konsisten'),
+    JSON_OBJECT('key','usability','label','Usability & Aksesibilitas','description','Kemudahan pengguna, kontras warna, ukuran tap target')
+)),
+('Jaringan & Infrastruktur', 'jaringan-infrastruktur', 'network', JSON_ARRAY(
+    JSON_OBJECT('key','topology_design','label','Desain Topologi & Perencanaan','description','Pemilihan perangkat, alokasi IP/VLAN, redundansi'),
+    JSON_OBJECT('key','configuration','label','Konfigurasi & Implementasi','description','Ketepatan konfigurasi perangkat, keamanan akses'),
+    JSON_OBJECT('key','documentation','label','Dokumentasi & Troubleshooting','description','Kejelasan dokumentasi, rencana penanganan gangguan')
+));
 
 -- Akun demo — password untuk semua akun demo: "password123"
 -- Hash di bawah dibuat dengan password_hash('password123', PASSWORD_DEFAULT)
@@ -36,4 +62,10 @@ INSERT INTO tasks (category_id, created_by, title, slug, industry_context, case_
 (1, 1, 'Bangun Komponen Validasi Form Registrasi', 'komponen-validasi-form-registrasi', 'Startup',
  'Buat fungsi validasi sisi server untuk form registrasi (nama, email, password) dengan pesan error yang jelas per-field, mengikuti prinsip clean code.',
  '<?php\nfunction validateRegistration($data) {\n    // TODO: implementasikan validasi\n}\n',
- 'pemula');
+ 'pemula'),
+(5, 1, 'Redesain Halaman Checkout E-commerce yang Membingungkan', 'redesain-checkout-ecommerce', 'E-commerce',
+ 'Tim produk menerima banyak keluhan pengguna yang batal checkout karena alur pembayaran membingungkan dan CTA tidak jelas. Tugasmu: desain ulang halaman checkout (mobile-first) di Figma yang menyelesaikan masalah hierarki visual dan usability tersebut, lalu jelaskan alasan keputusan desainmu.',
+ NULL, 'menengah'),
+(6, 1, 'Rancang Topologi Jaringan Kantor Cabang Baru', 'topologi-jaringan-kantor-cabang', 'Retail',
+ 'Perusahaan membuka kantor cabang baru dengan 30 karyawan, butuh pemisahan VLAN untuk divisi kasir/gudang/kantor, serta koneksi failover ke kantor pusat. Buat rancangan topologi, alokasi IP/VLAN, dan dokumentasi konfigurasi perangkat utamanya (router/switch/access point).',
+ NULL, 'menengah');

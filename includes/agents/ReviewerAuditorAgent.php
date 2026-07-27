@@ -4,18 +4,24 @@ require_once __DIR__ . '/AIClient.php';
 /**
  * SkillSync AI — Agent Reviewer & Auditor
  *
- * Berperan sebagai "Senior Tech Lead" yang mengaudit kode kiriman siswa:
- * - clean_code_score  : penamaan, komentar, panjang baris/fungsi, konsistensi
- * - security_score    : pola rawan SQL Injection, XSS, secret hardcoded, eval()
- * - efficiency_score  : query di dalam loop (N+1), perulangan tidak perlu
+ * Berperan sebagai "Senior Reviewer" lintas-divisi — bukan cuma kode. Kriteria
+ * penilaian datang dari rubric_criteria milik task_categories (3 kriteria per
+ * divisi: Programming, UI/UX Design, Jaringan & Infrastruktur, dst), jadi
+ * agent yang sama bisa menilai submission kode, desain (gambar/link Figma),
+ * maupun dokumentasi jaringan — dengan pertanyaan penilaian yang relevan
+ * masing-masing, bukan "SQL Injection" dipaksakan ke semua divisi.
  *
- * Mode Hybrid: sekumpulan pemeriksaan keamanan deterministik (regex, presisi
- * tinggi) SELALU dijalankan, baik saat Groq tersedia maupun tidak. Ini
- * membuat temuan kritikal (SQLi, XSS, secret hardcoded) tidak bergantung
- * 100% pada penilaian LLM yang sifatnya probabilistik — setiap temuan diberi
- * label sumber ('static-verified' vs 'ai-judged') supaya siswa dan mitra
- * tahu persis mana yang machine-verified dan mana yang penilaian kualitatif
- * AI. Ini yang membuat skor bisa dipertanggungjawabkan, bukan black-box.
+ * Untuk konsistensi dengan skema database (kolom clean_code_score/
+ * security_score/efficiency_score di ai_reviews), 3 skor itu dipakai sebagai
+ * SLOT GENERIK untuk rubric_criteria[0/1/2] — label yang tampil ke siswa
+ * mengikuti rubric kategori masing-masing (lihat task_rubric() di
+ * functions.php), bukan selalu "Clean Code/Keamanan/Efisiensi" secara harfiah.
+ *
+ * Mode Hybrid KHUSUS submission_type='code': sekumpulan pemeriksaan keamanan
+ * deterministik (regex, presisi tinggi) SELALU dijalankan di samping AI —
+ * temuan diberi label sumber ('static-verified' vs 'ai-judged'). Untuk divisi
+ * non-kode (desain/jaringan) belum ada pemeriksaan deterministik yang setara,
+ * jadi penilaian sepenuhnya rubric+AI (atau heuristik konservatif).
  */
 class ReviewerAuditorAgent
 {
@@ -27,52 +33,78 @@ class ReviewerAuditorAgent
     }
 
     /**
+     * @param string      $content        Kode, ATAU deskripsi/dokumentasi untuk submission non-kode
+     * @param string      $taskBrief      Deskripsi studi kasus
+     * @param array       $rubric         3 kriteria [{key,label,description}, ...] dari task_rubric()
+     * @param string      $submissionType 'code'|'design'|'network'|'general'
+     * @param string|null $externalLink   Link eksternal (mis. Figma) bila ada
+     * @param string|null $fileName       Nama file yang diunggah siswa bila ada — HANYA nama file yang
+     *                                    dikirim ke AI (bukan isi gambar; lihat catatan di reviewWithAI())
      * @return array{clean_code_score:int,security_score:int,efficiency_score:int,
      *               overall_score:int,summary:string,findings:array,ai_assisted:bool}
      */
-    public function review(string $code, string $taskBrief): array
+    public function review(string $content, string $taskBrief, array $rubric, string $submissionType = 'code', ?string $externalLink = null, ?string $fileName = null): array
     {
-        $staticFindings = $this->staticVerifiedChecks($code);
+        $isCode = $submissionType === 'code';
+        $staticFindings = $isCode ? $this->staticVerifiedChecks($content) : [];
 
         if ($this->ai->isAvailable()) {
-            $result = $this->reviewWithAI($code, $taskBrief, $staticFindings);
+            $result = $this->reviewWithAI($content, $taskBrief, $staticFindings, $rubric, $submissionType, $externalLink, $fileName);
             if ($result !== null) {
                 return $result;
             }
         }
 
-        return $this->auditStatic($code, $staticFindings);
+        return $isCode
+            ? $this->auditStatic($content, $staticFindings)
+            : $this->auditGenericHeuristic($content, $rubric, $submissionType, $externalLink, $fileName);
     }
 
-    private function reviewWithAI(string $code, string $taskBrief, array $staticFindings): ?array
+    private function reviewWithAI(string $content, string $taskBrief, array $staticFindings, array $rubric, string $submissionType, ?string $externalLink, ?string $fileName): ?array
     {
-        $staticNote = empty($staticFindings)
-            ? 'Pemeriksaan statis deterministik tidak menemukan pola berbahaya yang jelas.'
-            : 'Pemeriksaan statis deterministik SUDAH menemukan hal berikut secara pasti (jangan diulang di findings-mu, cukup pertimbangkan dalam skor): '
-              . implode('; ', array_map(fn($f) => $f['title'], $staticFindings));
+        [$c1, $c2, $c3] = [$rubric[0], $rubric[1], $rubric[2]];
+        $staticNote = '';
+        if ($submissionType === 'code') {
+            $staticNote = empty($staticFindings)
+                ? 'Pemeriksaan statis deterministik tidak menemukan pola berbahaya yang jelas.'
+                : 'Pemeriksaan statis deterministik SUDAH menemukan hal berikut secara pasti (jangan diulang di findings-mu, cukup pertimbangkan dalam skor): '
+                  . implode('; ', array_map(fn($f) => $f['title'], $staticFindings));
+        }
 
-        $system = "Kamu adalah SkillSync AI Reviewer & Auditor — Senior Tech Lead yang mengaudit kode siswa SMK "
-                . "untuk kesiapan magang di industri. Nilai berdasarkan: clean code (penamaan, struktur, komentar), "
-                . "keamanan (SQL Injection, XSS, secret hardcoded, validasi input), dan efisiensi (kompleksitas, "
-                . "query N+1, redundansi). Bersikap membangun dan spesifik, sebutkan nomor baris bila relevan. "
-                . "{$staticNote} "
-                . "Balas dalam format JSON: {\"clean_code_score\":0-100,\"security_score\":0-100,"
-                . "\"efficiency_score\":0-100,\"summary\":\"ringkasan 2-3 kalimat berbahasa Indonesia\","
+        $roleContext = [
+            'code'    => 'Senior Tech Lead yang mengaudit kode siswa SMK untuk kesiapan magang di industri',
+            'design'  => 'Senior Product Designer yang mereview hasil desain UI/UX siswa SMK untuk kesiapan magang di industri',
+            'network' => 'Senior Network Engineer yang mereview rancangan/dokumentasi jaringan siswa SMK untuk kesiapan magang di industri',
+            'general' => 'Senior Reviewer lintas-divisi yang menilai hasil kerja siswa SMK untuk kesiapan magang di industri',
+        ][$submissionType] ?? 'Senior Reviewer';
+
+        $system = "Kamu adalah SkillSync AI Reviewer & Auditor — {$roleContext}. "
+                . "Nilai berdasarkan TEPAT 3 kriteria berikut (jangan menilai di luar ini): "
+                . "(1) {$c1['label']} — {$c1['description']}; "
+                . "(2) {$c2['label']} — {$c2['description']}; "
+                . "(3) {$c3['label']} — {$c3['description']}. "
+                . "Bersikap membangun dan spesifik, rujuk bagian konkret dari hasil kerja siswa. {$staticNote} "
+                . "Balas dalam format JSON: {\"criterion1_score\":0-100,\"criterion2_score\":0-100,"
+                . "\"criterion3_score\":0-100,\"summary\":\"ringkasan 2-3 kalimat berbahasa Indonesia\","
                 . "\"findings\":[{\"severity\":\"info|warning|critical\",\"title\":\"...\",\"detail\":\"...\"}]}";
 
-        $user = "Studi kasus:\n{$taskBrief}\n\nKode kiriman siswa:\n```\n{$code}\n```";
+        $extra = '';
+        if ($externalLink) $extra .= "\nLink eksternal yang disertakan siswa: {$externalLink}";
+        if ($fileName) $extra .= "\nSiswa juga melampirkan file: {$fileName} (nama file saja — kamu tidak bisa melihat isinya, nilai berdasarkan deskripsi siswa dan konteks yang tersedia).";
+
+        $user = "Studi kasus:\n{$taskBrief}\n\nHasil kerja/penjelasan siswa:\n```\n{$content}\n```{$extra}";
 
         $result = $this->ai->completeJson($system, [['role' => 'user', 'content' => $user]], 1500);
-        if ($result === null || !isset($result['clean_code_score'])) {
+        if ($result === null || !isset($result['criterion1_score'])) {
             return null;
         }
 
-        $clean = (int) $result['clean_code_score'];
-        $sec   = (int) $result['security_score'];
-        $eff   = (int) $result['efficiency_score'];
+        $s1 = (int) $result['criterion1_score'];
+        $s2 = (int) $result['criterion2_score'];
+        $s3 = (int) $result['criterion3_score'];
 
         // Setiap temuan AI ditandai sumbernya secara eksplisit, digabung dengan
-        // temuan statis yang sudah pasti (deterministik) — bukan hasil "karangan" LLM.
+        // temuan statis yang sudah pasti (deterministik, khusus submission kode).
         $aiFindings = array_map(function ($f) {
             $f['source'] = 'ai-judged';
             return $f;
@@ -81,24 +113,77 @@ class ReviewerAuditorAgent
         $merged = array_merge($staticFindings, $aiFindings);
         if (empty($merged)) {
             $merged[] = ['severity' => 'info', 'title' => 'Tidak ada masalah signifikan terdeteksi',
-                'detail' => 'Audit AI dan pemeriksaan statis sama-sama tidak menemukan isu berarti.', 'source' => 'static-verified'];
+                'detail' => 'Audit AI tidak menemukan isu berarti pada ketiga kriteria yang dinilai.', 'source' => 'ai-judged'];
         }
 
-        // Skor keamanan tidak boleh lebih tinggi dari yang diizinkan temuan statis kritikal —
-        // mencegah LLM "melunakkan" skor padahal ada bukti pasti SQLi/XSS/secret bocor.
-        $hardCap = $this->securityHardCap($staticFindings);
-        if ($hardCap !== null) {
-            $sec = min($sec, $hardCap);
+        // Skor keamanan (khusus kode) tidak boleh lebih tinggi dari yang diizinkan
+        // temuan statis kritikal — mencegah LLM "melunakkan" skor padahal ada bukti
+        // pasti SQLi/XSS/secret bocor. Hanya berlaku untuk submission_type='code'.
+        if ($submissionType === 'code') {
+            $hardCap = $this->securityHardCap($staticFindings);
+            if ($hardCap !== null) {
+                $s2 = min($s2, $hardCap);
+            }
         }
 
         return [
-            'clean_code_score' => $clean,
-            'security_score'   => max(0, min(100, $sec)),
-            'efficiency_score' => $eff,
-            'overall_score'    => $this->weightedOverall($clean, max(0, min(100, $sec)), $eff),
+            'clean_code_score' => max(0, min(100, $s1)),
+            'security_score'   => max(0, min(100, $s2)),
+            'efficiency_score' => max(0, min(100, $s3)),
+            'overall_score'    => $this->weightedOverall($s1, $s2, $s3),
             'summary'          => $result['summary'] ?? 'Ulasan tersedia pada daftar temuan.',
             'findings'         => $merged,
             'ai_assisted'      => true,
+        ];
+    }
+
+    /**
+     * Fallback heuristik untuk submission NON-KODE (desain/jaringan/umum) saat
+     * AI tidak tersedia. Jauh lebih sederhana & konservatif dibanding auditStatic()
+     * karena tidak ada pemeriksaan pola deterministik yang setara untuk divisi
+     * ini — cuma menilai kelengkapan (ada link/file, panjang penjelasan) sebagai
+     * proksi kasar, BUKAN kualitas substansi. Skor dipagari maksimum 70 dan
+     * summary selalu menyebutkan keterbatasan ini secara eksplisit.
+     */
+    private function auditGenericHeuristic(string $content, array $rubric, string $submissionType, ?string $externalLink, ?string $fileName): array
+    {
+        $wordCount = str_word_count(strip_tags($content));
+        $hasEvidence = $externalLink || $fileName;
+
+        $completeness = match (true) {
+            $wordCount < 15 => 25,
+            $wordCount < 40 => 50,
+            $wordCount < 100 => 70,
+            default => 80,
+        };
+        if (!$hasEvidence && in_array($submissionType, ['design', 'network'], true)) {
+            $completeness -= 15; // desain/jaringan idealnya selalu menyertakan bukti visual/dokumen
+        }
+        $completeness = max(0, min(70, $completeness)); // dipagari 70 — heuristik ini tidak menilai substansi
+
+        $findings = [
+            ['severity' => 'warning', 'title' => 'Dinilai dengan mode heuristik lokal',
+                'detail' => 'Groq API tidak tersedia saat submission ini dinilai. Skor di bawah HANYA berdasarkan kelengkapan (panjang penjelasan, ada/tidaknya link/file) — BUKAN evaluasi substansi ' . $rubric[0]['label'] . '/' . $rubric[1]['label'] . '/' . $rubric[2]['label'] . ' yang sesungguhnya. Sambungkan GROQ_API_KEY lalu minta siswa submit ulang untuk penilaian yang valid.',
+                'source' => 'static-verified'],
+        ];
+        if (!$hasEvidence) {
+            $findings[] = ['severity' => 'info', 'title' => 'Belum ada link/file pendukung',
+                'detail' => 'Sertakan link (mis. Figma) atau file (screenshot/dokumen) supaya reviewer punya bukti konkret untuk dinilai.', 'source' => 'static-verified'];
+        }
+
+        $overall = $this->weightedOverall($completeness, $completeness, $completeness);
+        $summary = "Audit otomatis (mode heuristik lokal — belum tersambung ke Groq API) hanya bisa menilai kelengkapan "
+                 . "submission ({$overall}/100), BELUM benar-benar mengevaluasi substansi {$rubric[0]['label']}, {$rubric[1]['label']}, "
+                 . "maupun {$rubric[2]['label']}. Hubungkan Groq API untuk penilaian yang sesungguhnya.";
+
+        return [
+            'clean_code_score' => $completeness,
+            'security_score'   => $completeness,
+            'efficiency_score' => $completeness,
+            'overall_score'    => $overall,
+            'summary'          => $summary,
+            'findings'         => $findings,
+            'ai_assisted'      => false,
         ];
     }
 

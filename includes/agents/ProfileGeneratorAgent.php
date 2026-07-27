@@ -18,6 +18,12 @@ require_once __DIR__ . '/AIClient.php';
  * dengan comprehension_avg (bobot 70% kualitas kode : 30% pemahaman nyata).
  * Ini mencegah submission "kode rapi tapi tidak dipahami pemiliknya sendiri"
  * otomatis mendapat skor kompetensi tinggi — lihat DefenseAgent.
+ *
+ * Selain ringkasan lintas-divisi di atas, regenerate() juga menghitung
+ * breakdown skor TERPISAH per kategori/divisi ke skill_profile_tracks
+ * (lihat regenerateTracks()) — supaya dashboard bisa menampilkan skor
+ * Programming vs UI/UX Design vs Jaringan secara terpisah, bukan
+ * membaurkan kriteria yang beda makna jadi satu rata-rata.
  */
 class ProfileGeneratorAgent
 {
@@ -120,7 +126,72 @@ class ProfileGeneratorAgent
 
         log_activity($userId, 'profile_regenerated', "Skor overall: {$data['overall_score']}/100 · {$data['tasks_completed']} studi kasus");
 
+        $this->regenerateTracks($userId);
+
         return $data;
+    }
+
+    /**
+     * Hitung & simpan rata-rata TERPISAH per kategori/divisi ke
+     * skill_profile_tracks — supaya dashboard bisa menampilkan breakdown
+     * yang jujur (mis. skor Programming vs skor UI/UX Design terpisah),
+     * bukan satu angka yang membaurkan kriteria berbeda makna.
+     */
+    private function regenerateTracks(int $userId): void
+    {
+        $pdo = db();
+
+        $stmt = $pdo->prepare(
+            'SELECT t.category_id, r.clean_code_score AS c1, r.security_score AS c2, r.efficiency_score AS c3, r.overall_score
+             FROM ai_reviews r
+             JOIN submissions s ON s.id = r.submission_id
+             JOIN tasks t ON t.id = s.task_id
+             WHERE s.user_id = ?'
+        );
+        $stmt->execute([$userId]);
+        $rows = $stmt->fetchAll();
+
+        $defStmt = $pdo->prepare(
+            'SELECT t.category_id, ds.comprehension_score
+             FROM defense_sessions ds
+             JOIN submissions s ON s.id = ds.submission_id
+             JOIN tasks t ON t.id = s.task_id
+             WHERE s.user_id = ? AND ds.status = \'evaluated\''
+        );
+        $defStmt->execute([$userId]);
+        $defRows = $defStmt->fetchAll();
+
+        $byCategory = [];
+        foreach ($rows as $r) {
+            $byCategory[$r['category_id']]['reviews'][] = $r;
+        }
+        foreach ($defRows as $d) {
+            $byCategory[$d['category_id']]['defense'][] = $d['comprehension_score'];
+        }
+
+        $upsert = $pdo->prepare(
+            'INSERT INTO skill_profile_tracks (user_id, category_id, overall_score, criterion1_score, criterion2_score, criterion3_score, comprehension_avg, tasks_completed)
+             VALUES (?,?,?,?,?,?,?,?)
+             ON DUPLICATE KEY UPDATE overall_score=VALUES(overall_score), criterion1_score=VALUES(criterion1_score),
+                criterion2_score=VALUES(criterion2_score), criterion3_score=VALUES(criterion3_score),
+                comprehension_avg=VALUES(comprehension_avg), tasks_completed=VALUES(tasks_completed)'
+        );
+
+        foreach ($byCategory as $categoryId => $data) {
+            $reviews = $data['reviews'] ?? [];
+            $n = count($reviews);
+            if ($n === 0) continue;
+
+            $avg = fn(string $key) => (int) round(array_sum(array_column($reviews, $key)) / $n);
+            $c1 = $avg('c1'); $c2 = $avg('c2'); $c3 = $avg('c3');
+            $codeOverall = $avg('overall_score');
+
+            $defenseScores = $data['defense'] ?? [];
+            $compAvg = $defenseScores ? (int) round(array_sum($defenseScores) / count($defenseScores)) : 0;
+            $overall = $defenseScores ? (int) round(($codeOverall * 0.7) + ($compAvg * 0.3)) : $codeOverall;
+
+            $upsert->execute([$userId, $categoryId, $overall, $c1, $c2, $c3, $compAvg, $n]);
+        }
     }
 
     private function buildNarrative(int $overall, int $clean, int $sec, int $eff, int $count, string $badge, string $strengths, string $weaknesses, array $reviews, int $comprehensionAvg, bool $hasDefense): string

@@ -53,6 +53,38 @@ function get_flashes(): array
     return $flashes;
 }
 
+/**
+ * Decode rubric_criteria JSON milik sebuah task_categories row menjadi array
+ * 3 kriteria [{key,label,description}, ...]. Selalu mengembalikan 3 kriteria
+ * yang valid — fallback ke rubric kode default kalau kolom kosong/NULL
+ * (mis. instalasi lama yang belum migrasi), supaya halaman tidak pernah crash.
+ */
+function task_rubric(array $category): array
+{
+    $default = [
+        ['key' => 'clean_code', 'label' => 'Clean Code', 'description' => 'Penamaan, struktur, komentar, konsistensi'],
+        ['key' => 'security', 'label' => 'Keamanan', 'description' => 'Validasi input, penanganan data sensitif'],
+        ['key' => 'efficiency', 'label' => 'Efisiensi', 'description' => 'Kompleksitas, redundansi'],
+    ];
+    $decoded = !empty($category['rubric_criteria']) ? json_decode($category['rubric_criteria'], true) : null;
+    if (!is_array($decoded) || count($decoded) < 3) {
+        return $default;
+    }
+    return array_slice($decoded, 0, 3);
+}
+
+/** Label form & ikon per submission_type — dipakai task.php & submission.php supaya konsisten. */
+function submission_type_config(string $type): array
+{
+    $map = [
+        'code'    => ['label' => 'Kode Program', 'field_label' => 'Kode/Implementasi', 'accepts_file' => false, 'accepts_link' => false],
+        'design'  => ['label' => 'Desain UI/UX', 'field_label' => 'Penjelasan Keputusan Desain', 'accepts_file' => true, 'accepts_link' => true],
+        'network' => ['label' => 'Jaringan & Infrastruktur', 'field_label' => 'Dokumentasi Konfigurasi/Topologi', 'accepts_file' => true, 'accepts_link' => false],
+        'general' => ['label' => 'Umum', 'field_label' => 'Jawaban/Penjelasan', 'accepts_file' => true, 'accepts_link' => true],
+    ];
+    return $map[$type] ?? $map['general'];
+}
+
 function badge_from_score(int $score): string
 {
     if ($score >= 90) return 'Top Talent';

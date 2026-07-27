@@ -10,10 +10,14 @@ $user = current_user();
 $pdo = db();
 
 $taskId = (int) ($_GET['id'] ?? 0);
-$stmt = $pdo->prepare('SELECT t.*, c.name AS category_name FROM tasks t JOIN task_categories c ON c.id = t.category_id WHERE t.id = ?');
+$stmt = $pdo->prepare('SELECT t.*, c.name AS category_name, c.submission_type, c.rubric_criteria FROM tasks t JOIN task_categories c ON c.id = t.category_id WHERE t.id = ?');
 $stmt->execute([$taskId]);
 $task = $stmt->fetch();
 if (!$task) { flash('error', 'Studi kasus tidak ditemukan.'); redirect('tasks.php'); }
+
+$submissionType = $task['submission_type'] ?: 'code';
+$rubric = task_rubric($task);
+$typeConfig = submission_type_config($submissionType);
 
 $pageTitle = $task['title'];
 $errors = [];
@@ -22,16 +26,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user['role'] === 'siswa') {
     if (!csrf_verify()) {
         redirect('task.php?id=' . $taskId);
     }
-    $code = $_POST['code_content'] ?? '';
+    $content = $_POST['code_content'] ?? '';
     $notes = trim($_POST['notes'] ?? '');
-    if (trim($code) === '') {
-        $errors[] = 'Kode tidak boleh kosong.';
-    } else {
-        $ins = $pdo->prepare('INSERT INTO submissions (task_id, user_id, language, code_content, notes, status) VALUES (?,?,?,?,?,\'submitted\')');
-        $ins->execute([$taskId, $user['id'], 'php', $code, $notes]);
+    $externalLink = trim($_POST['external_link'] ?? '');
+
+    if (trim($content) === '') {
+        $errors[] = $submissionType === 'code' ? 'Kode tidak boleh kosong.' : 'Penjelasan tidak boleh kosong.';
+    }
+
+    // --- Upload file opsional (screenshot desain, topologi jaringan, dll) ---
+    $filePath = null;
+    $fileNameForAi = null;
+    if (!empty($_FILES['submission_file']['name']) && empty($errors)) {
+        $file = $_FILES['submission_file'];
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $errors[] = 'Gagal mengunggah file. Coba lagi.';
+        } else {
+            $allowed = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf'];
+            $mime = function_exists('finfo_open')
+                ? finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file['tmp_name'])
+                : ($file['type'] ?? null);
+            if (!in_array($mime, $allowed, true)) {
+                $errors[] = 'Format file harus PNG/JPG/WEBP/PDF.';
+            } elseif ($file['size'] > 8 * 1024 * 1024) {
+                $errors[] = 'Ukuran file maksimal 8MB.';
+            } else {
+                $uploadsDir = __DIR__ . '/uploads/submissions';
+                if (!is_dir($uploadsDir)) mkdir($uploadsDir, 0755, true);
+                $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $basename = bin2hex(random_bytes(8)) . '_' . time() . '.' . $ext;
+                if (move_uploaded_file($file['tmp_name'], $uploadsDir . '/' . $basename)) {
+                    $filePath = 'uploads/submissions/' . $basename;
+                    $fileNameForAi = $file['name'];
+                } else {
+                    $errors[] = 'Gagal menyimpan file. Periksa izin direktori.';
+                }
+            }
+        }
+    }
+
+    if (empty($errors)) {
+        $ins = $pdo->prepare('INSERT INTO submissions (task_id, user_id, language, code_content, file_path, external_link, notes, status) VALUES (?,?,?,?,?,?,?,\'submitted\')');
+        $ins->execute([$taskId, $user['id'], $submissionType, $content, $filePath, $externalLink ?: null, $notes]);
         $submissionId = (int) $pdo->lastInsertId();
 
-        $review = (new ReviewerAuditorAgent())->review($code, $task['case_brief']);
+        $review = (new ReviewerAuditorAgent())->review($content, $task['case_brief'], $rubric, $submissionType, $externalLink ?: null, $fileNameForAi);
         $pdo->prepare(
             'INSERT INTO ai_reviews (submission_id, clean_code_score, security_score, efficiency_score, overall_score, summary, findings_json)
              VALUES (?,?,?,?,?,?,?)'
@@ -45,10 +84,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user['role'] === 'siswa') {
         log_activity($user['id'], 'submission_reviewed', "\"{$task['title']}\" · skor {$review['overall_score']}/100 · mode: {$mode}");
 
         // --- Agent Defense: buat sesi pembelaan otomatis (anti-cheat) -----
-        // Siswa wajib menjawab pertanyaan yang merujuk kode/temuan spesifiknya
-        // sendiri sebelum skor pemahaman ikut membentuk profil kompetensinya.
+        // Siswa wajib menjawab pertanyaan yang merujuk hasil kerja/temuan
+        // spesifiknya sendiri sebelum skor pemahaman ikut membentuk profil.
         $defenseAgent = new DefenseAgent();
-        $dq = $defenseAgent->generateQuestions($code, $task['case_brief'], $review['findings']);
+        $dq = $defenseAgent->generateQuestions($content, $task['case_brief'], $review['findings']);
         $sessionIns = $pdo->prepare('INSERT INTO defense_sessions (submission_id, status, ai_assisted) VALUES (?, \'pending\', ?)');
         $sessionIns->execute([$submissionId, $dq['ai_assisted'] ? 1 : 0]);
         $sessionId = (int) $pdo->lastInsertId();
@@ -137,15 +176,36 @@ require __DIR__ . '/includes/header.php';
     <?php endif; ?>
 
     <!-- Submission Form -->
-    <form method="POST" class="mt-6 surface rounded-3xl p-8" id="submitForm">
+    <form method="POST" enctype="multipart/form-data" class="mt-6 surface rounded-3xl p-8" id="submitForm">
       <?= csrf_field() ?>
       <div class="flex items-center gap-2 mb-4">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--ink); color: white;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         </div>
-        <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-light)]">Kirim Solusi Kamu</p>
+        <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-light)]">Kirim Solusi Kamu &middot; <?= e($typeConfig['label']) ?></p>
       </div>
-      <textarea name="code_content" rows="14" required class="code-editor w-full rounded-2xl px-5 py-4 text-xs focus:ring-2 focus:ring-neutral-300" style="background: var(--ink); color: #e2e8f0; border: 2px solid var(--ink-light);" placeholder="Tempel kode PHP kamu di sini..."><?= e($task['starter_code'] ?? '') ?></textarea>
+
+      <?php if ($submissionType === 'code'): ?>
+        <textarea name="code_content" rows="14" required class="code-editor w-full rounded-2xl px-5 py-4 text-xs focus:ring-2 focus:ring-neutral-300" style="background: var(--ink); color: #e2e8f0; border: 2px solid var(--ink-light);" placeholder="Tempel kode PHP kamu di sini..."><?= e($task['starter_code'] ?? '') ?></textarea>
+      <?php else: ?>
+        <label><?= e($typeConfig['field_label']) ?></label>
+        <textarea name="code_content" rows="8" required placeholder="Jelaskan pendekatan, keputusan desain/konfigurasi, dan alasannya secara detail..."></textarea>
+
+        <?php if ($typeConfig['accepts_link']): ?>
+        <div class="mt-4">
+          <label>Link Eksternal <span class="text-[var(--muted-light)] font-normal">(mis. link Figma — opsional tapi sangat disarankan)</span></label>
+          <input type="url" name="external_link" placeholder="https://figma.com/file/...">
+        </div>
+        <?php endif; ?>
+
+        <?php if ($typeConfig['accepts_file']): ?>
+        <div class="mt-4">
+          <label>Unggah File <span class="text-[var(--muted-light)] font-normal">(screenshot/topologi/dokumen — PNG/JPG/PDF, maks 8MB, opsional tapi sangat disarankan)</span></label>
+          <input type="file" name="submission_file" accept=".png,.jpg,.jpeg,.webp,.pdf" class="file-input-custom">
+        </div>
+        <?php endif; ?>
+      <?php endif; ?>
+
       <div class="mt-4">
         <label>Catatan untuk reviewer <span class="text-[var(--muted-light)] font-normal">(opsional)</span></label>
         <textarea name="notes" rows="2" placeholder="Jelaskan pendekatan yang kamu ambil…"></textarea>

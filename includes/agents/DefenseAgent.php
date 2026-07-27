@@ -48,14 +48,15 @@ class DefenseAgent
         $system = "Kamu adalah SkillSync AI Defense Examiner. Tugasmu memverifikasi bahwa siswa BENAR-BENAR memahami "
                 . "project yang dia submit sendiri — bukan sekadar menempel hasil generate AI tanpa paham isinya. "
                 . "Buat 4 pertanyaan singkat berbahasa Indonesia yang HANYA bisa dijawab dengan mudah oleh orang yang "
-                . "benar-benar mengerjakan/memahami kode ini. Rujuk bagian SPESIFIK dari kode atau temuan reviewer "
-                . "(nama variabel/fungsi, keputusan desain, potongan logika tertentu) — JANGAN pertanyaan generik "
-                . "seperti 'apa itu CRUD' yang bisa dijawab tanpa lihat kodenya sama sekali. Variasikan jenis pertanyaan: "
+                . "benar-benar mengerjakan/memahami hasil kerja ini (kode, desain, atau dokumentasi teknis). Rujuk bagian SPESIFIK dari "
+                . "hasil kerja atau temuan reviewer (nama variabel/fungsi/komponen/perangkat, keputusan desain, "
+                . "potongan logika/konfigurasi tertentu) — JANGAN pertanyaan generik "
+                . "seperti 'apa itu CRUD' yang bisa dijawab tanpa lihat hasil kerjanya sama sekali. Variasikan jenis pertanyaan: "
                 . "(1) alasan sebuah keputusan desain, (2) apa yang terjadi pada satu edge case tertentu, "
                 . "(3) trade-off pendekatan yang dipakai, (4) bagaimana memperluas satu bagian fitur. "
                 . "Balas dalam format JSON: {\"questions\":[\"...\",\"...\",\"...\",\"...\"]}";
 
-        $user = "Studi kasus:\n{$taskBrief}\n\nTemuan reviewer atas kode ini: {$findingTitles}\n\nKode kiriman siswa:\n```\n{$code}\n```";
+        $user = "Studi kasus:\n{$taskBrief}\n\nTemuan reviewer atas hasil kerja ini: {$findingTitles}\n\nHasil kerja/kode kiriman siswa:\n```\n{$code}\n```";
 
         $result = $this->ai->completeJson($system, [['role' => 'user', 'content' => $user]], 700);
         if ($result === null || empty($result['questions']) || !is_array($result['questions'])) {
@@ -76,11 +77,11 @@ class DefenseAgent
         ];
 
         foreach (array_slice($findings, 0, 3) as $f) {
-            $questions[] = "Reviewer menandai: \"{$f['title']}\". Coba jelaskan kenapa bagian itu bisa terjadi di kodemu, dan bagaimana cara memperbaikinya?";
+            $questions[] = "Reviewer menandai: \"{$f['title']}\". Coba jelaskan kenapa bagian itu bisa terjadi di hasil kerjamu, dan bagaimana cara memperbaikinya?";
         }
 
         $questions[] = 'Kalau ada satu input yang tidak terduga (misalnya kosong, sangat panjang, atau format aneh) dikirim ke fitur utamamu, apa yang akan terjadi pada program ini? Sudah kamu tangani atau belum?';
-        $questions[] = 'Bagian mana dari kode ini yang paling sulit kamu kerjakan, dan pendekatan apa yang akhirnya kamu pakai?';
+        $questions[] = 'Bagian mana dari hasil kerja ini yang paling sulit kamu kerjakan, dan pendekatan apa yang akhirnya kamu pakai?';
 
         return array_slice($questions, 0, 5);
     }
@@ -107,9 +108,9 @@ class DefenseAgent
     {
         $system = "Kamu adalah SkillSync AI Defense Examiner yang menilai SESI PEMBELAAN PROJECT siswa SMK. "
                 . "Untuk tiap pasangan pertanyaan-jawaban, nilai apakah jawaban itu menunjukkan PEMAHAMAN NYATA atas "
-                . "kode yang disubmit siswa (bukan cuma jawaban umum/template/asal yang bisa ditulis siapa saja tanpa "
-                . "baca kodenya). Jawaban yang spesifik, konsisten dengan kode, dan menunjukkan penalaran diberi skor "
-                . "tinggi; jawaban vague, generik, tidak nyambung dengan kode, atau kosong diberi skor rendah. "
+                . "hasil kerja yang disubmit siswa (bukan cuma jawaban umum/template/asal yang bisa ditulis siapa saja tanpa "
+                . "melihat hasil kerjanya). Jawaban yang spesifik, konsisten dengan hasil kerja, dan menunjukkan penalaran diberi skor "
+                . "tinggi; jawaban vague, generik, tidak nyambung dengan hasil kerja, atau kosong diberi skor rendah. "
                 . "Bersikap adil tapi kritis — tujuannya memverifikasi keaslian pemahaman, bukan menghukum siswa yang "
                 . "gaya bahasanya sederhana selama substansinya benar. "
                 . "Balas dalam format JSON: {\"per_question\":[{\"score\":0-100,\"feedback\":\"1 kalimat singkat\"}],"
@@ -119,7 +120,7 @@ class DefenseAgent
         foreach ($qa as $i => $item) {
             $qaText .= ($i + 1) . ". Q: {$item['question']}\n   A: " . (trim($item['answer']) !== '' ? $item['answer'] : '(tidak dijawab)') . "\n\n";
         }
-        $user = "Kode kiriman siswa:\n```\n{$code}\n```\n\nSesi tanya-jawab:\n{$qaText}";
+        $user = "Hasil kerja/kode kiriman siswa:\n```\n{$code}\n```\n\nSesi tanya-jawab:\n{$qaText}";
 
         $result = $this->ai->completeJson($system, [['role' => 'user', 'content' => $user]], 1200);
         if ($result === null || !isset($result['comprehension_score']) || !isset($result['per_question'])) {

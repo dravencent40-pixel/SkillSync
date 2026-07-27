@@ -19,6 +19,16 @@ $stmt = $pdo->prepare(
 $stmt->execute([$user['id']]);
 $profile = $stmt->fetch() ?: ['overall_score'=>0,'clean_code_avg'=>0,'security_avg'=>0,'efficiency_avg'=>0,'tasks_completed'=>0,'badge'=>'Pemula','strengths'=>null,'weaknesses'=>null,'is_public'=>1,'jurusan'=>null,'kelas'=>null,'sekolah'=>null];
 
+$tracksStmt = $pdo->prepare(
+    'SELECT spt.*, c.name AS category_name, c.rubric_criteria
+     FROM skill_profile_tracks spt
+     JOIN task_categories c ON c.id = spt.category_id
+     WHERE spt.user_id = ? AND spt.tasks_completed > 0
+     ORDER BY spt.tasks_completed DESC, spt.overall_score DESC'
+);
+$tracksStmt->execute([$user['id']]);
+$tracks = $tracksStmt->fetchAll();
+
 $historyStmt = $pdo->prepare(
     'SELECT s.id, s.submitted_at, t.title, r.overall_score, r.clean_code_score, r.security_score, r.efficiency_score
      FROM submissions s JOIN tasks t ON t.id = s.task_id
@@ -82,28 +92,37 @@ require __DIR__ . '/includes/header.php';
       </div>
     </div>
 
-    <div class="lg:col-span-2 surface p-8 rounded-3xl grid grid-cols-3 gap-4">
-      <div class="text-center p-4 rounded-2xl hover:bg-[#f5f5f5] transition-colors">
-        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: #f5f5f5;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+    <div class="lg:col-span-2 surface p-8 rounded-3xl">
+      <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-light)] mb-4">Skor Per Divisi</p>
+      <?php if (empty($tracks)): ?>
+        <p class="text-sm text-[var(--muted)]">Belum ada studi kasus yang diselesaikan.</p>
+      <?php else: ?>
+        <div class="space-y-4 divide-y divide-[var(--border-light)]">
+          <?php foreach ($tracks as $i => $track): $rubric = task_rubric($track); ?>
+          <div class="<?= $i > 0 ? 'pt-4' : '' ?>">
+            <div class="flex items-center justify-between mb-3">
+              <span class="badge badge-info"><?= e($track['category_name']) ?></span>
+              <span class="text-sm font-bold <?= score_color_class((int)$track['overall_score']) ?>"><?= (int)$track['overall_score'] ?>/100</span>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+              <div class="text-center">
+                <p class="text-lg font-extrabold <?= score_color_class((int)$track['criterion1_score']) ?>"><?= (int)$track['criterion1_score'] ?></p>
+                <p class="text-[11px] text-[var(--muted)] mt-0.5 leading-tight"><?= e($rubric[0]['label']) ?></p>
+              </div>
+              <div class="text-center">
+                <p class="text-lg font-extrabold <?= score_color_class((int)$track['criterion2_score']) ?>"><?= (int)$track['criterion2_score'] ?></p>
+                <p class="text-[11px] text-[var(--muted)] mt-0.5 leading-tight"><?= e($rubric[1]['label']) ?></p>
+              </div>
+              <div class="text-center">
+                <p class="text-lg font-extrabold <?= score_color_class((int)$track['criterion3_score']) ?>"><?= (int)$track['criterion3_score'] ?></p>
+                <p class="text-[11px] text-[var(--muted)] mt-0.5 leading-tight"><?= e($rubric[2]['label']) ?></p>
+              </div>
+            </div>
+            <p class="text-[11px] text-[var(--muted-light)] mt-2"><?= (int)$track['tasks_completed'] ?> studi kasus &middot; pemahaman rata-rata <?= (int)$track['comprehension_avg'] ?>/100</p>
+          </div>
+          <?php endforeach; ?>
         </div>
-        <p class="text-2xl font-extrabold <?= score_color_class((int)$profile['clean_code_avg']) ?>"><?= (int)$profile['clean_code_avg'] ?></p>
-        <p class="text-xs text-[var(--muted)] mt-1 font-medium">Clean Code</p>
-      </div>
-      <div class="text-center p-4 rounded-2xl hover:bg-[#f5f5f5] transition-colors">
-        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: #f5f5f5;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <p class="text-2xl font-extrabold <?= score_color_class((int)$profile['security_avg']) ?>"><?= (int)$profile['security_avg'] ?></p>
-        <p class="text-xs text-[var(--muted)] mt-1 font-medium">Keamanan</p>
-      </div>
-      <div class="text-center p-4 rounded-2xl hover:bg-[#f5f5f5] transition-colors">
-        <div class="w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center" style="background: #f5f5f5;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        </div>
-        <p class="text-2xl font-extrabold <?= score_color_class((int)$profile['efficiency_avg']) ?>"><?= (int)$profile['efficiency_avg'] ?></p>
-        <p class="text-xs text-[var(--muted)] mt-1 font-medium">Efisiensi</p>
-      </div>
+      <?php endif; ?>
     </div>
   </div>
 
