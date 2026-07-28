@@ -1,4 +1,4 @@
-a# SkillSync AI
+# SkillSync AI
 
 **AI Technical Project Lead & Assessment Agent** untuk siswa SMK dan perusahaan mitra magang.
 
