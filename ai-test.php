@@ -1,6 +1,6 @@
 <?php
 /**
- * SkillSync AI — Alat Diagnosa Koneksi Groq API
+ * SkillSync — Alat Diagnosa Koneksi Groq API
  *
  * Buka halaman ini langsung di browser (mis. http://localhost/skillsync/ai-test.php)
  * setelah login untuk melihat PERSIS kenapa Reviewer/Mentor jatuh ke mode heuristik
@@ -38,7 +38,7 @@ $curlVersion = extension_loaded('curl') ? curl_version() : null;
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Diagnosa Koneksi AI — SkillSync AI</title>
+<title>Diagnosa Koneksi AI — SkillSync</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#fafafa;}</style>
 </head>

@@ -1,5 +1,5 @@
 -- =====================================================================
--- SkillSync AI — Seed Data (opsional, untuk demo)
+-- SkillSync — Seed Data (opsional, untuk demo)
 -- Jalankan setelah schema.sql. Pilih database yang sesuai di phpMyAdmin
 -- dulu sebelum import file ini — jangan pakai baris USE.
 -- =====================================================================

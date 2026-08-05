@@ -1,6 +1,6 @@
 <?php
 /**
- * SkillSync AI — AIClient
+ * SkillSync — AIClient
  * Lapisan tipis di atas Groq API (OpenAI-compatible chat completions, gratis).
  *
  * Jika GROQ_API_KEY tidak diset, isAvailable() akan mengembalikan false

@@ -1,5 +1,5 @@
 -- =====================================================================
--- SkillSync AI — Database Schema (MySQL 8+/MariaDB 10.5+)
+-- SkillSync — Database Schema (MySQL 8+/MariaDB 10.5+)
 -- AI Technical Project Lead & Assessment Agent untuk SMK/Perusahaan Tech
 -- =====================================================================
 -- Import: mysql -u root -p nama_database_kamu < schema.sql

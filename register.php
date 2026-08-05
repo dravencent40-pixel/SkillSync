@@ -72,19 +72,19 @@ require __DIR__ . '/includes/header.php';
 <div class="min-h-[80vh] flex items-center justify-center px-6 py-10">
   <div class="w-full max-w-md mx-auto animate-fade-up">
     <div class="lg:hidden flex items-center gap-3 mb-8">
-      <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold" style="background: var(--gradient-accent); box-shadow: 0 2px 8px rgba(37,99,235,0.3);">
+      <div class="logo-tile w-10 h-10">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
       </div>
       <span class="font-bold text-xl">SkillSync <span class="text-accent">AI</span></span>
     </div>
 
     <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Buat akun baru</h1>
-    <p class="mt-2 text-sm text-[#525252]">Gabung sebagai siswa untuk mulai mengasah kompetensi, atau sebagai mitra untuk menemukan talenta.</p>
+    <p class="mt-2 text-sm text-[var(--muted)]">Gabung sebagai siswa untuk mulai mengasah kompetensi, atau sebagai mitra untuk menemukan talenta.</p>
 
     <?php if ($errors): ?>
-      <div class="mt-5 p-4 rounded-xl border border-red-200 flex items-start gap-3" style="background: #fef2f2;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
-        <div class="text-sm text-red-700">
+      <div class="mt-5 p-4 rounded-xl border border-[#f3d6d2] bg-[var(--danger-50)] flex items-start gap-3">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
+        <div class="text-sm text-[var(--danger)]">
           <?php foreach ($errors as $err): ?><p><?= e($err) ?></p><?php endforeach; ?>
         </div>
       </div>
@@ -153,14 +153,8 @@ require __DIR__ . '/includes/header.php';
       </button>
     </form>
 
-    <p class="mt-6 text-center text-sm text-[#525252]">Sudah punya akun? <a href="<?= APP_URL ?>/login.php" class="link-accent">Masuk di sini</a></p>
+    <p class="mt-6 text-center text-sm text-[var(--muted)]">Sudah punya akun? <a href="<?= APP_URL ?>/login.php" class="link-accent">Masuk di sini</a></p>
   </div>
 </div>
-
-<style>
-.role-option { display:flex; align-items:center; gap:8px; padding:0.75rem 1rem; border-radius: var(--radius-lg); border:1.5px solid var(--border); font-size:0.875rem; font-weight:600; color: var(--muted); cursor:pointer; transition: all var(--duration-fast) ease; }
-.role-option:hover { border-color: var(--accent-100); background: var(--accent-50); }
-.role-option.active { border-color: var(--accent); background: var(--accent-50); color: var(--accent-dark); }
-</style>
 
 <?php require __DIR__ . '/includes/footer.php'; ?>

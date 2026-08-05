@@ -1,10 +1,10 @@
 -- =====================================================================
--- SkillSync AI — Migrasi: Agent Defense (sesi pembelaan project)
+-- SkillSync — Migrasi: Agent Defense (sesi pembelaan project)
 -- Jalankan HANYA jika database kamu sudah pernah di-setup sebelum
 -- update ini. Instalasi baru via schema.sql atau setup.php sudah
 -- otomatis menyertakan tabel ini, jadi migrasi ini tidak perlu dijalankan.
 --
--- Jalankan: mysql -u root -p skillsync_ai < database/migrate_defense.sql
+-- Jalankan: mysql -u root -p skillsync < database/migrate_defense.sql
 -- =====================================================================
 
 -- Skor pemahaman rata-rata siswa, ikut membentuk overall_score di Profile Generator.

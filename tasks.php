@@ -59,7 +59,7 @@ require __DIR__ . '/includes/header.php';
       <p class="mt-1 text-sm text-[var(--muted)]"><?= $user['role']==='siswa' ? 'Diterbitkan oleh Agent Task Issuer & mitra industri.' : 'Kelola bank soal yang akan disajikan Agent Task Issuer.' ?></p>
     </div>
     <?php if ($user['role'] === 'mitra'): ?>
-    <button onclick="document.getElementById('newTaskModal').classList.remove('hidden')" class="btn btn-primary shrink-0">
+    <button onclick="document.getElementById('newTaskModal').classList.add('open')" class="btn btn-primary shrink-0">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
        Terbitkan Studi Kasus
     </button>
@@ -67,16 +67,16 @@ require __DIR__ . '/includes/header.php';
   </div>
 
   <?php if ($errors): ?>
-    <div class="mt-6 p-4 rounded-xl border border-red-200 flex items-start gap-3 animate-fade-up" style="background: var(--danger-50);">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
-      <div class="text-sm text-red-700">
+    <div class="mt-6 p-4 rounded-xl border border-[#f3d6d2] bg-[var(--danger-50)] flex items-start gap-3 animate-fade-up">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
+      <div class="text-sm text-[var(--danger)]">
         <?php foreach ($errors as $err): ?><p><?= e($err) ?></p><?php endforeach; ?>
       </div>
     </div>
   <?php endif; ?>
 
   <?php if (empty($tasks)): ?>
-    <div class="mt-10 surface rounded-3xl p-14">
+    <div class="mt-10 surface p-14">
       <div class="empty-state">
         <div class="empty-state-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -88,15 +88,15 @@ require __DIR__ . '/includes/header.php';
   <?php else: ?>
   <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 stagger">
     <?php foreach ($tasks as $t): ?>
-    <div class="surface surface-hover spot-card p-6 rounded-2xl flex flex-col group">
+    <div class="surface surface-hover spot-card p-6 flex flex-col group">
       <div class="flex items-center justify-between">
-        <span class="badge badge-info"><?= e($t['category_name']) ?></span>
+        <span class="badge badge-accent"><?= e($t['category_name']) ?></span>
         <span class="flex items-center gap-1.5 text-[11px] font-medium text-[var(--muted)] capitalize">
-          <span class="w-1.5 h-1.5 rounded-full <?= $t['difficulty']==='mahir'?'bg-red-400':($t['difficulty']==='menengah'?'bg-neutral-400':'bg-neutral-400') ?>"></span>
+          <span class="w-1.5 h-1.5 rounded-full <?= $t['difficulty']==='mahir' ? 'bg-[var(--danger)]' : ($t['difficulty']==='menengah' ? 'bg-[var(--warning)]' : 'bg-[var(--accent)]') ?>"></span>
           <?= e($t['difficulty']) ?>
         </span>
       </div>
-      <h3 class="mt-4 font-semibold text-[var(--ink)] leading-snug group-hover:text-[#0a0a0a] transition-colors"><?= e($t['title']) ?></h3>
+      <h3 class="mt-4 font-semibold text-[var(--ink)] leading-snug"><?= e($t['title']) ?></h3>
       <p class="mt-2 text-xs text-[var(--muted)] line-clamp-3 leading-relaxed"><?= e(mb_substr($t['case_brief'], 0, 110)) ?>…</p>
       <div class="mt-5 pt-4 border-t border-[var(--border-light)] flex items-center justify-between">
         <span class="text-xs text-[var(--muted-light)] flex items-center gap-1.5">
@@ -119,14 +119,14 @@ require __DIR__ . '/includes/header.php';
 
 <!-- Create Task Modal (Mitra) -->
 <?php if ($user['role'] === 'mitra'): ?>
-  <div id="newTaskModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(15,23,42,0.6);">
-  <div class="bg-white rounded-3xl max-w-lg w-full p-8 max-h-[90vh] overflow-y-auto animate-scale-in" style="box-shadow: var(--shadow-xl);">
+  <div id="newTaskModal" class="modal-overlay">
+  <div class="modal-card max-w-lg w-full p-8">
     <div class="flex items-center justify-between mb-6">
       <div>
         <h2 class="text-lg font-bold text-[var(--ink)]">Terbitkan Studi Kasus</h2>
         <p class="text-xs text-[var(--muted)] mt-0.5">Isi detail studi kasus untuk siswa</p>
       </div>
-      <button onclick="document.getElementById('newTaskModal').classList.add('hidden')" class="modal-close">
+      <button onclick="document.getElementById('newTaskModal').classList.remove('open')" class="modal-close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
       </button>
     </div>
@@ -163,9 +163,9 @@ require __DIR__ . '/includes/header.php';
       </div>
       <div>
         <label>Kode Awal <span class="text-[var(--muted-light)] font-normal">(opsional)</span></label>
-        <textarea name="starter_code" rows="4" class="code-editor" style="background: var(--ink); color: #e2e8f0; font-size: 0.8125rem;" placeholder="<?php\n// kode bermasalah yang perlu diperbaiki siswa"></textarea>
+        <textarea name="starter_code" rows="4" class="code-editor" placeholder="<?= e('// kode bermasalah yang perlu diperbaiki siswa') ?>"></textarea>
       </div>
-      <button type="submit" class="btn btn-dark w-full py-3">Terbitkan</button>
+      <button type="submit" class="btn btn-primary w-full py-3">Terbitkan</button>
     </form>
   </div>
 </div>

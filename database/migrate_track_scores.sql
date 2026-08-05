@@ -1,5 +1,5 @@
 -- =====================================================================
--- SkillSync AI — Migrasi: Skor Per-Divisi (skill_profile_tracks)
+-- SkillSync — Migrasi: Skor Per-Divisi (skill_profile_tracks)
 --
 -- Masalah yang diperbaiki: skill_profiles.clean_code_avg/security_avg/
 -- efficiency_avg merata-ratakan SEMUA submission siswa jadi satu angka,
@@ -13,7 +13,7 @@
 -- badge & pencarian talenta mitra), tapi dashboard siswa sekarang menampilkan
 -- breakdown per divisi dari tabel ini, bukan satu rata-rata yang membaurkan.
 --
--- Jalankan: mysql -u root -p skillsync_ai < database/migrate_track_scores.sql
+-- Jalankan: mysql -u root -p skillsync < database/migrate_track_scores.sql
 -- =====================================================================
 
 CREATE TABLE IF NOT EXISTS skill_profile_tracks (

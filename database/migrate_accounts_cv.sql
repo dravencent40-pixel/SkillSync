@@ -1,5 +1,5 @@
 -- =====================================================================
--- SkillSync AI — Migrasi: CV terhubung ke akun siswa
+-- SkillSync — Migrasi: CV terhubung ke akun siswa
 --
 -- Sebelumnya upload_cv.php menyimpan CV di file JSON terpisah
 -- (uploads/cvs/metadata.json) dengan nama/email yang diketik manual —
@@ -10,7 +10,7 @@
 -- Migrasi ini memindahkan CV jadi milik akun siswa yang login, disimpan
 -- di kolom berikut (bukan lagi file JSON terpisah).
 --
--- Jalankan: mysql -u root -p skillsync_ai < database/migrate_accounts_cv.sql
+-- Jalankan: mysql -u root -p skillsync < database/migrate_accounts_cv.sql
 -- =====================================================================
 
 ALTER TABLE student_profiles

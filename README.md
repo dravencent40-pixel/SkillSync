@@ -1,8 +1,8 @@
-# SkillSync AI
+# SkillSync
 
 **AI Technical Project Lead & Assessment Agent** untuk siswa SMK dan perusahaan mitra magang.
 
-SkillSync AI mengotomatisasi tiga hal yang biasanya makan waktu guru pembimbing dan tim
+SkillSync mengotomatisasi tiga hal yang biasanya makan waktu guru pembimbing dan tim
 rekrutmen: memberi studi kasus yang relevan, mengaudit kode siswa secara objektif, dan
 menyaring talenta lewat skor kompetensi yang transparan — bukan cuma CV.
 
@@ -55,12 +55,12 @@ berjalan penuh tanpa API key maupun koneksi internet.
 
 ```bash
 # 1. Clone repo
-git clone https://github.com/dravencent40-pixel/SkillSync-AI.git
+git clone https://github.com/dravencent40-pixel/SkillSync.git
 cd skillsync
 
 # 2. Import skema database
 mysql -u root -p < database/schema.sql
-mysql -u root -p skillsync_ai < database/seed.sql   # data demo, opsional
+mysql -u root -p skillsync < database/seed.sql   # data demo, opsional
 # atau pakai installer web: buka database/setup.php di browser
 
 # 3. Salin & isi konfigurasi

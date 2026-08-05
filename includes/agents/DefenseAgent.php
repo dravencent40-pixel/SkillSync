@@ -2,7 +2,7 @@
 require_once __DIR__ . '/AIClient.php';
 
 /**
- * SkillSync AI — Agent Defense
+ * SkillSync — Agent Defense
  *
  * Anti-cheat layer di atas Agent Reviewer & Auditor. Skor kode saja tidak bisa
  * membedakan "siswa yang paham keputusan desainnya sendiri" dari "siswa yang
@@ -45,7 +45,7 @@ class DefenseAgent
     {
         $findingTitles = implode('; ', array_slice(array_column($findings, 'title'), 0, 5));
 
-        $system = "Kamu adalah SkillSync AI Defense Examiner. Tugasmu memverifikasi bahwa siswa BENAR-BENAR memahami "
+        $system = "Kamu adalah SkillSync Defense Examiner. Tugasmu memverifikasi bahwa siswa BENAR-BENAR memahami "
                 . "project yang dia submit sendiri — bukan sekadar menempel hasil generate AI tanpa paham isinya. "
                 . "Buat 4 pertanyaan singkat berbahasa Indonesia yang HANYA bisa dijawab dengan mudah oleh orang yang "
                 . "benar-benar mengerjakan/memahami hasil kerja ini (kode, desain, atau dokumentasi teknis). Rujuk bagian SPESIFIK dari "
@@ -106,7 +106,7 @@ class DefenseAgent
 
     private function evaluateWithAI(string $code, array $qa): ?array
     {
-        $system = "Kamu adalah SkillSync AI Defense Examiner yang menilai SESI PEMBELAAN PROJECT siswa SMK. "
+        $system = "Kamu adalah SkillSync Defense Examiner yang menilai SESI PEMBELAAN PROJECT siswa SMK. "
                 . "Untuk tiap pasangan pertanyaan-jawaban, nilai apakah jawaban itu menunjukkan PEMAHAMAN NYATA atas "
                 . "hasil kerja yang disubmit siswa (bukan cuma jawaban umum/template/asal yang bisa ditulis siapa saja tanpa "
                 . "melihat hasil kerjanya). Jawaban yang spesifik, konsisten dengan hasil kerja, dan menunjukkan penalaran diberi skor "

@@ -42,7 +42,7 @@ require __DIR__ . '/../includes/header.php';
   </div>
 
   <?php if (empty($talents)): ?>
-    <div class="mt-10 surface rounded-3xl p-14">
+    <div class="mt-10 surface p-14">
       <div class="empty-state">
         <div class="empty-state-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -70,7 +70,7 @@ require __DIR__ . '/../includes/header.php';
             <span class="text-[11px] text-[var(--muted-light)]"><?= (int)$t['tasks_completed'] ?> studi kasus</span>
           </div>
           <?php if ($t['cv_path']): ?>
-            <p class="mt-2 text-[11px] font-medium flex items-center gap-1" style="color: var(--success);">
+            <p class="mt-2 text-[11px] font-medium flex items-center gap-1" style="color: var(--accent);">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
               CV tersedia
             </p>

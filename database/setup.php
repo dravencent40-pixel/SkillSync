@@ -1,12 +1,12 @@
-<?php
+﻿<?php
 /**
- * SkillSync AI — Database Setup Script
+ * SkillSync â€” Database Setup Script
  * 
  * Jalankan sekali dari browser: http://localhost:8000/database/setup.php
  * atau dari CLI: php database/setup.php
  * 
  * Script ini akan:
- * 1. Membuat database skillsync_ai
+ * 1. Membuat database skillsync
  * 2. Membuat semua tabel (12 tabel)
  * 3. Mengisi seed data (akun demo, kategori, studi kasus)
  * 4. Memverifikasi setup
@@ -23,13 +23,13 @@ function out($msg, $isCLI) {
 }
 
 if (!$isCLI) {
-    echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SkillSync AI - Database Setup</title>';
+    echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SkillSync - Database Setup</title>';
     echo '<style>body{font-family:monospace;max-width:800px;margin:2rem auto;padding:0 1rem;background:#0f172a;color:#e2e8f0;line-height:1.8;}';
     echo '.ok{color:#10b981;}.err{color:#ef4444;}.info{color:#3b82f6;}.title{font-size:1.5rem;font-weight:bold;margin-bottom:1rem;color:#fff;}';
     echo '.card{background:#1e293b;padding:1.5rem;border-radius:1rem;margin:1rem 0;border:1px solid #334155;}';
     echo 'code{background:#334155;padding:2px 6px;border-radius:4px;font-size:0.9em;}';
     echo '</style></head><body>';
-    echo '<div class="title">◎ SkillSync AI — Database Setup</div>';
+    echo '<div class="title">â—Ž SkillSync â€” Database Setup</div>';
 }
 
 out("", $isCLI);
@@ -49,9 +49,9 @@ try {
             PDO::ATTR_EMULATE_PREPARES => false,
         ]
     );
-    out('<span class="ok">✓ Berhasil terhubung ke MySQL</span>', $isCLI);
+    out('<span class="ok">âœ“ Berhasil terhubung ke MySQL</span>', $isCLI);
 } catch (PDOException $e) {
-    out('<span class="err">✗ Gagal koneksi: ' . $e->getMessage() . '</span>', $isCLI);
+    out('<span class="err">âœ— Gagal koneksi: ' . $e->getMessage() . '</span>', $isCLI);
     out("Pastikan MySQL/MariaDB berjalan di XAMPP Control Panel.", $isCLI);
     if (!$isCLI) echo '</body></html>';
     exit(1);
@@ -62,15 +62,15 @@ out("", $isCLI);
 // ============================================================
 // Step 2: Create database
 // ============================================================
-out("Step 2: Membuat database skillsync_ai...", $isCLI);
+out("Step 2: Membuat database skillsync...", $isCLI);
 
 try {
-    $pdo->exec("DROP DATABASE IF EXISTS skillsync_ai");
-    $pdo->exec("CREATE DATABASE skillsync_ai CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    $pdo->exec("USE skillsync_ai");
-    out('<span class="ok">✓ Database skillsync_ai berhasil dibuat</span>', $isCLI);
+    $pdo->exec("DROP DATABASE IF EXISTS skillsync");
+    $pdo->exec("CREATE DATABASE skillsync CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    $pdo->exec("USE skillsync");
+    out('<span class="ok">âœ“ Database skillsync berhasil dibuat</span>', $isCLI);
 } catch (PDOException $e) {
-    out('<span class="err">✗ Gagal membuat database: ' . $e->getMessage() . '</span>', $isCLI);
+    out('<span class="err">âœ— Gagal membuat database: ' . $e->getMessage() . '</span>', $isCLI);
     if (!$isCLI) echo '</body></html>';
     exit(1);
 }
@@ -246,9 +246,9 @@ $tableNames = [
 foreach ($queries as $i => $sql) {
     try {
         $pdo->exec($sql);
-        out('<span class="ok">  ✓ ' . $tableNames[$i] . '</span>', $isCLI);
+        out('<span class="ok">  âœ“ ' . $tableNames[$i] . '</span>', $isCLI);
     } catch (PDOException $e) {
-        out('<span class="err">  ✗ ' . $tableNames[$i] . ': ' . $e->getMessage() . '</span>', $isCLI);
+        out('<span class="err">  âœ— ' . $tableNames[$i] . ': ' . $e->getMessage() . '</span>', $isCLI);
     }
 }
 
@@ -268,7 +268,7 @@ $pdo->exec("INSERT INTO task_categories (name, slug) VALUES
     ('Data & Backend', 'data-backend'),
     ('Keamanan Aplikasi', 'keamanan-aplikasi'),
     ('Mobile & UI', 'mobile-ui')");
-out('<span class="ok">  ✓ 4 task categories</span>', $isCLI);
+out('<span class="ok">  âœ“ 4 task categories</span>', $isCLI);
 
 // 4b. Users
 $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role, avatar_initial) VALUES (?, ?, ?, ?, ?)");
@@ -280,19 +280,19 @@ $users = [
 foreach ($users as $u) {
     $stmt->execute($u);
 }
-out('<span class="ok">  ✓ 3 users (admin + 2 siswa)</span>', $isCLI);
+out('<span class="ok">  âœ“ 3 users (admin + 2 siswa)</span>', $isCLI);
 
 // 4c. Company Profile
 $pdo->prepare("INSERT INTO company_profiles (user_id, company_name, industry, website, about) VALUES (?, ?, ?, ?, ?)")
     ->execute([1, 'Goodeva Technology', 'Software House', 'https://goodeva.tech', 'Mitra industri untuk penyaluran talenta magang SMK.']);
-out('<span class="ok">  ✓ 1 company profile</span>', $isCLI);
+out('<span class="ok">  âœ“ 1 company profile</span>', $isCLI);
 
 // 4d. Student Profiles
 $pdo->prepare("INSERT INTO student_profiles (user_id, nis, sekolah, jurusan, kelas) VALUES (?, ?, ?, ?, ?)")
     ->execute([2, '2024001', 'SMKN 9 Bekasi', 'Rekayasa Perangkat Lunak', 'XII RPL 1']);
 $pdo->prepare("INSERT INTO student_profiles (user_id, nis, sekolah, jurusan, kelas) VALUES (?, ?, ?, ?, ?)")
     ->execute([3, '2024002', 'SMKN 9 Bekasi', 'Rekayasa Perangkat Lunak', 'XII RPL 2']);
-out('<span class="ok">  ✓ 2 student profiles</span>', $isCLI);
+out('<span class="ok">  âœ“ 2 student profiles</span>', $isCLI);
 
 // 4e. Tasks
 $stmtTask = $pdo->prepare("INSERT INTO tasks (category_id, created_by, title, slug, industry_context, case_brief, starter_code, difficulty) VALUES (?,?,?,?,?,?,?,?)");
@@ -314,7 +314,7 @@ $tasks = [
 foreach ($tasks as $t) {
     $stmtTask->execute($t);
 }
-out('<span class="ok">  ✓ 3 studi kasus</span>', $isCLI);
+out('<span class="ok">  âœ“ 3 studi kasus</span>', $isCLI);
 
 out("", $isCLI);
 
@@ -339,7 +339,7 @@ foreach ($counts as $table => $count) {
 out('</div>', $isCLI);
 
 $total = array_sum($counts);
-out('<span class="ok">✓ Setup selesai! Total: ' . $total . ' baris di ' . count($tableNames) . ' tabel</span>', $isCLI);
+out('<span class="ok">âœ“ Setup selesai! Total: ' . $total . ' baris di ' . count($tableNames) . ' tabel</span>', $isCLI);
 
 out("", $isCLI);
 out("================================================", $isCLI);
@@ -364,7 +364,7 @@ out("================================================", $isCLI);
 
 if (!$isCLI) {
     echo '<div class="card" style="margin-top:2rem;">';
-    echo '<div style="font-size:1.1rem;font-weight:bold;margin-bottom:1rem;">🚀 Langkah Selanjutnya</div>';
+    echo '<div style="font-size:1.1rem;font-weight:bold;margin-bottom:1rem;">ðŸš€ Langkah Selanjutnya</div>';
     echo '<p style="color:#94a3b8;">Database sudah siap! Sekarang:</p>';
     echo '<ol style="margin:1rem 0;padding-left:1.5rem;color:#e2e8f0;">';
     echo '<li>Buka terminal di folder project</li>';
@@ -375,3 +375,4 @@ if (!$isCLI) {
     echo '</div>';
     echo '</body></html>';
 }
+

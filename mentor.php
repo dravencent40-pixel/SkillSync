@@ -28,7 +28,7 @@ if (!$conversation) {
 
     $welcome = $taskTitle
         ? "Halo {$user['name']}! Aku sudah lihat hasil audit untuk \"{$taskTitle}\". Ada bagian yang mau kamu diskusikan lebih lanjut?"
-        : "Halo {$user['name']}! Aku Agent Mentor SkillSync AI. Ceritakan apa yang sedang kamu kerjakan.";
+        : "Halo {$user['name']}! Aku Agent Mentor SkillSync. Ceritakan apa yang sedang kamu kerjakan.";
     $pdo->prepare("INSERT INTO mentor_messages (conversation_id, sender, message) VALUES (?, 'agent', ?)")->execute([$convId, $welcome]);
 }
 
@@ -43,24 +43,24 @@ require __DIR__ . '/includes/header.php';
 <section class="max-w-3xl mx-auto px-6 py-10 flex flex-col" style="height: calc(100dvh - 6.5rem);">
   <!-- Header -->
   <div class="flex items-center gap-4 mb-4 animate-fade-up shrink-0">
-    <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background: var(--gradient-dark); box-shadow: 0 2px 8px rgba(15,23,42,0.2);">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <div class="logo-tile w-12 h-12">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </div>
     <div>
       <h1 class="text-lg font-bold">Agent Mentor</h1>
       <p class="text-xs text-[var(--muted)] flex items-center gap-1.5">
-        <span class="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-pulse"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse"></span>
         <?= $taskTitle ? 'Konteks: ' . e($taskTitle) : 'Sesi bebas' ?>
       </p>
     </div>
   </div>
 
   <!-- Chat Window -->
-  <div id="chatWindow" class="flex-1 surface rounded-3xl p-5 overflow-y-auto flex flex-col gap-4 min-h-0">
+  <div id="chatWindow" class="flex-1 surface p-5 overflow-y-auto flex flex-col gap-4 min-h-0">
     <?php foreach ($messages as $m): ?>
       <?php if ($m['sender'] === 'agent'): ?>
         <div class="flex gap-3 max-w-[85%] animate-fade-up">
-          <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold" style="background: var(--gradient-dark); color: white;">M</div>
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold logo-tile">M</div>
           <div class="bubble-agent px-4 py-3 text-sm leading-relaxed"><?= nl2br(e($m['message'])) ?></div>
         </div>
       <?php else: ?>
@@ -77,9 +77,9 @@ require __DIR__ . '/includes/header.php';
     <input type="hidden" id="conversationId" value="<?= (int)$conversation['id'] ?>">
     <div class="flex-1 relative">
       <textarea id="chatInput" rows="1" required placeholder="Tanyakan tentang bug, konsep, atau feedback kode kamu…"
-        class="w-full resize-none pr-12 py-3 px-4 rounded-2xl border-2 border-[var(--border)] focus:border-neutral-400 text-sm"></textarea>
+        class="w-full resize-none pr-12 py-3 px-4 rounded-2xl border-[var(--border)] focus:border-[var(--accent)] text-sm"></textarea>
     </div>
-    <button type="submit" id="sendBtn" class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 text-white transition-all duration-200 hover:scale-105 active:scale-95" style="background: var(--gradient-dark); box-shadow: 0 2px 8px rgba(15,23,42,0.2);">
+    <button type="submit" id="sendBtn" class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-white transition-all duration-200 hover:scale-105 active:scale-95" style="background: var(--gradient-accent); box-shadow: var(--shadow-accent);">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </form>

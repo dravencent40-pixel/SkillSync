@@ -1,6 +1,6 @@
 <?php
 /**
- * SkillSync AI — Template Konfigurasi Aplikasi
+ * SkillSync — Template Konfigurasi Aplikasi
  * Salin file ini menjadi config.php, lalu isi nilai di bawah sesuai environment kamu.
  *   cp config/config.example.php config/config.php
  *
@@ -9,12 +9,12 @@
 
 // --- Database -----------------------------------------------------------
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'skillsync_ai');
+define('DB_NAME', 'skillsync');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 
 // --- Aplikasi -------------------------------------------------------------
-define('APP_NAME', 'SkillSync AI');
+define('APP_NAME', 'SkillSync');
 // Sesuaikan dengan folder project kamu di XAMPP, contoh: http://localhost/skillsync
 define('APP_URL', 'http://localhost/skillsync');
 

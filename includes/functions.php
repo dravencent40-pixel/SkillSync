@@ -1,6 +1,6 @@
 <?php
 /**
- * SkillSync AI — Helper Functions
+ * SkillSync — Helper Functions
  */
 
 function e(?string $str): string
@@ -169,7 +169,7 @@ function activity_label(string $action): array
         'submission_reviewed' => ['Agent Reviewer & Auditor menyelesaikan audit', '<path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>'],
         'mentor_reply'        => ['Agent Mentor membalas', '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'],
         'profile_regenerated' => ['Agent Profile Generator memperbarui profil kompetensi', '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'],
-        'login'                => ['Masuk ke SkillSync AI', '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/>'],
+        'login'                => ['Masuk ke SkillSync', '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/>'],
     ];
     return $map[$action] ?? [$action, '<circle cx="12" cy="12" r="10"/>'];
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * SkillSync AI — Agent Task Issuer
+ * SkillSync — Agent Task Issuer
  *
  * Bertugas memilih/merekomendasikan studi kasus dari bank soal (tabel `tasks`)
  * yang paling relevan untuk siswa tertentu, diprioritaskan pada kategori yang

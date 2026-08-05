@@ -2,7 +2,7 @@
 require_once __DIR__ . '/AIClient.php';
 
 /**
- * SkillSync AI — Agent Profile Generator
+ * SkillSync — Agent Profile Generator
  *
  * Mengagregasi seluruh ai_reviews milik seorang siswa menjadi satu
  * skill_profiles yang transparan dan siap direkomendasikan ke mitra industri.
@@ -202,7 +202,7 @@ class ProfileGeneratorAgent
 
         if ($this->ai->isAvailable()) {
             $recentTitles = implode(', ', array_slice(array_column($reviews, 'title'), -5));
-            $system = "Kamu adalah SkillSync AI Profile Generator. Tulis SATU paragraf (3-4 kalimat) ringkasan "
+            $system = "Kamu adalah SkillSync Profile Generator. Tulis SATU paragraf (3-4 kalimat) ringkasan "
                     . "kompetensi siswa untuk dibaca HR/tech lead mitra industri yang mempertimbangkan magang. "
                     . "Bahasa Indonesia, profesional, objektif — HANYA berdasarkan angka yang diberikan, jangan "
                     . "mengarang klaim di luar data. Sebutkan kekuatan utama dan satu area yang perlu berkembang.";

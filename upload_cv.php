@@ -75,16 +75,16 @@ require __DIR__ . '/includes/header.php';
   </div>
 
   <?php if ($errors): ?>
-    <div class="mb-6 p-4 rounded-xl border border-red-200 flex items-start gap-3" style="background: #fef2f2;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
-      <div class="text-sm text-red-700"><?php foreach ($errors as $err): ?><p><?= e($err) ?></p><?php endforeach; ?></div>
+    <div class="mb-6 p-4 rounded-xl border border-[#f3d6d2] flex items-start gap-3" style="background: var(--danger-50);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
+      <div class="text-sm" style="color: var(--danger);"><?php foreach ($errors as $err): ?><p><?= e($err) ?></p><?php endforeach; ?></div>
     </div>
   <?php endif; ?>
 
   <?php if ($profile && $profile['cv_path']): ?>
-    <div class="surface p-6 rounded-2xl mb-6 flex items-center justify-between gap-4 flex-wrap" style="border-color: var(--accent-100); background: var(--accent-50);">
+    <div class="surface p-6 mb-6 flex items-center justify-between gap-4 flex-wrap" style="border-color: var(--accent-100); background: var(--accent-50);">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl grid place-items-center shrink-0" style="background: white; color: var(--accent);">
+        <div class="w-10 h-10 rounded-xl grid place-items-center shrink-0" style="background: white; color: var(--accent); box-shadow: var(--shadow-sm);">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
         </div>
         <div>
@@ -92,15 +92,15 @@ require __DIR__ . '/includes/header.php';
           <p class="text-xs text-[var(--muted)]">Diunggah <?= time_ago($profile['cv_uploaded_at']) ?></p>
         </div>
       </div>
-      <a href="<?= APP_URL ?>/<?= e($profile['cv_path']) ?>" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Lihat CV</a>
+      <a href="<?= APP_URL ?>/view_cv.php?file=<?= urlencode(basename($profile['cv_path'])) ?>" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Lihat CV</a>
     </div>
 
     <div class="mb-6">
-      <iframe src="<?= APP_URL ?>/<?= e($profile['cv_path']) ?>" style="width:100%;height:500px;border:0;" class="rounded-2xl border border-[var(--border-light)]" title="Pratinjau CV"></iframe>
+      <iframe src="<?= APP_URL ?>/view_cv.php?file=<?= urlencode(basename($profile['cv_path'])) ?>" style="width:100%;height:500px;border:0;" class="rounded-2xl border border-[var(--border-light)]" title="Pratinjau CV"></iframe>
     </div>
   <?php endif; ?>
 
-  <form method="POST" enctype="multipart/form-data" class="surface p-8 rounded-3xl">
+  <form method="POST" enctype="multipart/form-data" class="surface p-8">
     <?= csrf_field() ?>
     <label>Unggah <?= $profile && $profile['cv_path'] ? 'ulang' : '' ?> CV (PDF, maks 5MB)</label>
     <input type="file" name="cv_file" accept="application/pdf" required class="file-input-custom">

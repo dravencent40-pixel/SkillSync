@@ -2,7 +2,7 @@
 require_once __DIR__ . '/AIClient.php';
 
 /**
- * SkillSync AI — Agent Reviewer & Auditor
+ * SkillSync — Agent Reviewer & Auditor
  *
  * Berperan sebagai "Senior Reviewer" lintas-divisi — bukan cuma kode. Kriteria
  * penilaian datang dari rubric_criteria milik task_categories (3 kriteria per
@@ -78,7 +78,7 @@ class ReviewerAuditorAgent
             'general' => 'Senior Reviewer lintas-divisi yang menilai hasil kerja siswa SMK untuk kesiapan magang di industri',
         ][$submissionType] ?? 'Senior Reviewer';
 
-        $system = "Kamu adalah SkillSync AI Reviewer & Auditor — {$roleContext}. "
+        $system = "Kamu adalah SkillSync Reviewer & Auditor — {$roleContext}. "
                 . "Nilai berdasarkan TEPAT 3 kriteria berikut (jangan menilai di luar ini): "
                 . "(1) {$c1['label']} — {$c1['description']}; "
                 . "(2) {$c2['label']} — {$c2['description']}; "

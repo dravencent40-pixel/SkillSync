@@ -1,6 +1,6 @@
 <?php
 /**
- * SkillSync AI — Agent Mentor
+ * SkillSync — Agent Mentor
  *
  * Chatbot interaktif yang berperan sebagai mentor teknis: menjawab pertanyaan
  * siswa seputar bug/kodenya, memberi hint (bukan langsung jawaban jadi), dan
@@ -34,7 +34,7 @@ class MentorAgent
 
     private function replyWithAI(array $history, string $userMessage, ?array $reviewContext): ?string
     {
-        $system = "Kamu adalah SkillSync AI Mentor — Senior Tech Lead yang membimbing siswa SMK secara langsung dan hangat. "
+        $system = "Kamu adalah SkillSync Mentor — Senior Tech Lead yang membimbing siswa SMK secara langsung dan hangat. "
                 . "Gaya bicara santai tapi profesional, berbahasa Indonesia. JANGAN langsung memberi kode jadi/jawaban penuh; "
                 . "beri petunjuk bertahap (hint) agar siswa tetap belajar berpikir, kecuali siswa memang memintanya secara eksplisit. "
                 . "Jika ada konteks hasil audit kode, kaitkan jawabanmu dengan temuan tersebut.";
@@ -90,7 +90,7 @@ class MentorAgent
             return "Sama-sama! Semangat terus ya, kirim lagi kalau ada yang mau didiskusikan. 🚀";
         }
         if (str_contains($m, 'halo') || str_contains($m, 'hai') || $m === '') {
-            return "Halo! Aku Agent Mentor SkillSync AI. Ceritakan bagian kode atau studi kasus yang bikin kamu stuck, "
+            return "Halo! Aku Agent Mentor SkillSync. Ceritakan bagian kode atau studi kasus yang bikin kamu stuck, "
                  . "nanti kita bahas bareng step by step.";
         }
 

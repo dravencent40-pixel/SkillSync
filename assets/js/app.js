@@ -1,4 +1,4 @@
-// SkillSync AI — shared frontend behaviour
+// SkillSync — shared frontend behaviour
 
 // ---- Mobile hamburger menu ----
 (function () {
@@ -9,7 +9,7 @@
   hamburger.addEventListener('click', function () {
     var isOpen = mobileMenu.classList.contains('open');
     mobileMenu.classList.toggle('open');
-    hamburger.classList.toggle('active');
+    hamburger.classList.toggle('open', !isOpen);
     document.body.style.overflow = isOpen ? '' : 'hidden';
   });
 
@@ -17,7 +17,7 @@
   mobileMenu.querySelectorAll('a').forEach(function (link) {
     link.addEventListener('click', function () {
       mobileMenu.classList.remove('open');
-      hamburger.classList.remove('active');
+      hamburger.classList.remove('open');
       document.body.style.overflow = '';
     });
   });
@@ -26,7 +26,7 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
       mobileMenu.classList.remove('open');
-      hamburger.classList.remove('active');
+      hamburger.classList.remove('open');
       document.body.style.overflow = '';
     }
   });
@@ -36,8 +36,8 @@
 document.querySelectorAll('.spot-card').forEach(function (card) {
   card.addEventListener('mousemove', function (e) {
     var rect = card.getBoundingClientRect();
-    card.style.setProperty('--x', (e.clientX - rect.left) + 'px');
-    card.style.setProperty('--y', (e.clientY - rect.top) + 'px');
+    card.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
+    card.style.setProperty('--my', (e.clientY - rect.top) + 'px');
   });
 });
 
@@ -142,16 +142,9 @@ document.querySelectorAll('textarea.code-editor').forEach(function (ta) {
 (function () {
   var header = document.getElementById('mainHeader');
   if (!header) return;
-  var lastScroll = 0;
 
   window.addEventListener('scroll', function () {
-    var currentScroll = window.pageYOffset;
-    if (currentScroll > 10) {
-      header.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)';
-    } else {
-      header.style.boxShadow = 'none';
-    }
-    lastScroll = currentScroll;
+    header.classList.toggle('scrolled', window.pageYOffset > 10);
   }, { passive: true });
 })();
 

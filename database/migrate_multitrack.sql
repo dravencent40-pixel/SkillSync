@@ -1,12 +1,12 @@
 -- =====================================================================
--- SkillSync AI — Migrasi: Multi-Track Assessment
+-- SkillSync — Migrasi: Multi-Track Assessment
 -- Menggeneralisasi sistem dari "hanya kode" menjadi rubric-driven untuk
 -- divisi apa pun (Programming, UI/UX Design, Jaringan, dst).
 --
 -- Jalankan HANYA jika database kamu sudah pernah di-setup sebelum
 -- update ini. Instalasi baru via schema.sql sudah otomatis menyertakan ini.
 --
--- Jalankan: mysql -u root -p skillsync_ai < database/migrate_multitrack.sql
+-- Jalankan: mysql -u root -p skillsync < database/migrate_multitrack.sql
 -- =====================================================================
 
 -- ---------------------------------------------------------------------

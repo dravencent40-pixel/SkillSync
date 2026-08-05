@@ -110,25 +110,19 @@ require __DIR__ . '/includes/header.php';
   </div>
 
   <?php if ($errors): ?>
-    <div class="mt-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm"><?= e($errors[0]) ?></div>
+    <div class="mt-6 p-4 rounded-2xl bg-[var(--danger-50)] border border-[#f3d6d2] text-[var(--danger)] text-sm"><?= e($errors[0]) ?></div>
   <?php endif; ?>
 
   <?php if ($session['status'] === 'evaluated'): ?>
     <!-- ==================== HASIL EVALUASI ==================== -->
-    <div class="mt-8 surface spot-card p-8 rounded-3xl flex items-center gap-6">
+    <div class="mt-8 surface spot-card p-8 flex items-center gap-6">
       <div class="relative w-24 h-24 shrink-0">
         <svg class="score-ring w-24 h-24" data-score="<?= (int)$session['comprehension_score'] ?>" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="42" fill="none" stroke="#e2e8f0" stroke-width="8"/>
-          <circle class="progress" cx="50" cy="50" r="42" fill="none" stroke="url(#defenseGradient)" stroke-width="8" stroke-linecap="round"/>
-          <defs>
-            <linearGradient id="defenseGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:#3b82f6"/>
-              <stop offset="100%" style="stop-color:#1d4ed8"/>
-            </linearGradient>
-          </defs>
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" stroke-width="8"/>
+          <circle class="progress" cx="50" cy="50" r="42" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round"/>
         </svg>
         <div class="absolute inset-0 grid place-items-center">
-          <span class="text-2xl font-extrabold text-[var(--ink)]"><?= (int)$session['comprehension_score'] ?></span>
+          <span class="num text-2xl font-extrabold text-[var(--ink)]"><?= (int)$session['comprehension_score'] ?></span>
         </div>
       </div>
       <div>
@@ -144,7 +138,7 @@ require __DIR__ . '/includes/header.php';
 
     <div class="mt-8 space-y-4 stagger">
       <?php foreach ($questions as $q): ?>
-        <div class="surface p-6 rounded-2xl">
+        <div class="surface p-6">
           <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-light)] mb-1">Pertanyaan</p>
           <p class="font-semibold text-[var(--ink)]"><?= e($q['question']) ?></p>
           <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-light)] mt-4 mb-1">Jawabanmu</p>
@@ -158,7 +152,7 @@ require __DIR__ . '/includes/header.php';
     </div>
 
   <?php elseif ($user['role'] !== 'siswa'): ?>
-    <div class="mt-8 surface rounded-3xl p-12">
+    <div class="mt-8 surface p-12">
       <div class="empty-state">
         <div class="empty-state-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -173,7 +167,7 @@ require __DIR__ . '/includes/header.php';
     <form method="POST" class="mt-8 space-y-5 stagger">
       <?= csrf_field() ?>
       <?php foreach ($questions as $i => $q): ?>
-        <div class="surface p-6 rounded-2xl">
+        <div class="surface p-6">
           <div class="flex items-center gap-2 mb-3">
             <span class="w-6 h-6 rounded-full grid place-items-center text-xs font-bold text-white" style="background: var(--gradient-accent);"><?= $i + 1 ?></span>
             <p class="font-semibold text-[var(--ink)]"><?= e($q['question']) ?></p>

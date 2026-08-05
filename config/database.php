@@ -1,6 +1,6 @@
 <?php
 /**
- * SkillSync AI — Database Connection (PDO)
+ * SkillSync — Database Connection (PDO)
  */
 require_once __DIR__ . '/config.php';
 
