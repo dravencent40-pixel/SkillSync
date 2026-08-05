@@ -9,7 +9,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= isset($pageTitle) ? e($pageTitle) . ' · ' : '' ?>SkillSync AI</title>
 <meta name="description" content="Platform asesmen teknis berbasis AI untuk siswa SMK dan mitra industri.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2'><circle cx='12' cy='12' r='10'/><circle cx='12' cy='12' r='6'/><circle cx='12' cy='12' r='2'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -32,7 +32,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
   <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
     <a href="<?= APP_URL ?>/index.php" class="flex items-center gap-3 shrink-0 group">
       <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm transition-transform duration-300 group-hover:scale-110" style="background: var(--gradient-accent); box-shadow: 0 2px 10px rgba(37,99,235,0.35);">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
       </div>
       <span class="font-bold tracking-tight text-lg hidden sm:block">SkillSync <span class="text-accent">AI</span></span>
     </a>

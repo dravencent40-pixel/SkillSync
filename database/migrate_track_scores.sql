@@ -15,7 +15,6 @@
 --
 -- Jalankan: mysql -u root -p skillsync_ai < database/migrate_track_scores.sql
 -- =====================================================================
-USE skillsync_ai;
 
 CREATE TABLE IF NOT EXISTS skill_profile_tracks (
     id                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

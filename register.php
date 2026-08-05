@@ -73,7 +73,7 @@ require __DIR__ . '/includes/header.php';
   <div class="w-full max-w-md mx-auto animate-fade-up">
     <div class="lg:hidden flex items-center gap-3 mb-8">
       <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold" style="background: var(--gradient-accent); box-shadow: 0 2px 8px rgba(37,99,235,0.3);">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
       </div>
       <span class="font-bold text-xl">SkillSync <span class="text-accent">AI</span></span>
     </div>

@@ -1,117 +1,136 @@
 # SkillSync AI
 
-AI Technical Project Lead & Assessment Agent untuk siswa SMK dan perusahaan mitra magang.
-PHP native (tanpa framework) + MySQL, dengan 4 agent: **Task Issuer**, **Reviewer & Auditor**,
-**Mentor**, dan **Profile Generator**.
+**AI Technical Project Lead & Assessment Agent** untuk siswa SMK dan perusahaan mitra magang.
 
-## Menjalankan
+SkillSync AI mengotomatisasi tiga hal yang biasanya makan waktu guru pembimbing dan tim
+rekrutmen: memberi studi kasus yang relevan, mengaudit hasil kerja siswa secara objektif, dan
+menyaring talenta lewat skor kompetensi yang transparan — bukan cuma CV.
 
-1. Butuh PHP 8.1+ dengan ekstensi **pdo_mysql** dan **mbstring** (keduanya wajib —
-   `MentorAgent` dan helper string di `functions.php` memakai fungsi `mb_*`).
-2. Buat database lalu import skema:
-   ```bash
-   mysql -u root -p < database/schema.sql
-   mysql -u root -p skillsync_ai < database/seed.sql   # data demo (opsional)
-   ```
-   Atau pakai installer web: buka `database/setup.php` di browser.
-3. Salin `config/config.example.php` menjadi `config/config.php` (`cp config/config.example.php config/config.php`),
-   lalu isi sesuai environment kamu (host DB, `APP_URL`, dan `GROQ_API_KEY` bila mau mode
-   Groq AI aktif — tanpa key, aplikasi tetap jalan penuh di **mode heuristik lokal**).
-   `config/config.php` sengaja ada di `.gitignore` — jangan pernah commit file ini karena
-   berisi API key & kredensial DB.
-4. Arahkan document root ke folder ini, atau jalankan dev server:
-   ```bash
-   php -S localhost:8000
-   ```
-5. **Jika kamu upgrade dari instalasi lama** (sebelum update ini), jalankan migrasi kolom baru:
-   ```bash
-   mysql -u root -p skillsync_ai < database/migrate_narrative.sql
-   ```
+Sistem ini **rubric-driven dan multi-divisi**: setiap kategori studi kasus punya bentuk
+submission serta 3 kriteria penilaiannya sendiri, sehingga tidak hanya kode pemrograman yang
+dinilai, tapi juga UI/UX Design, Jaringan & Infrastruktur, dan kategori lain.
 
-## Yang Diperbarui di Update Ini
+Dibangun dengan **PHP native (tanpa framework)** + **MySQL**, terintegrasi dengan **Groq API
+(Llama 3.3 70B)** untuk kecerdasan agent, dengan **fallback heuristik lokal** sehingga tetap
+berjalan penuh tanpa API key maupun koneksi internet.
 
-Fokus utama update ini: memperkuat lapisan **AI Agent** (bukan cuma tampilan), karena
-itu yang paling dinilai di kompetisi — plus menutup celah keamanan dasar untuk kesiapan produksi.
+> Proyek ini dikembangkan oleh **Kelompok Tekabe** untuk Lomba AI Agent Innovation — Goodeva
+> Technology (Kategori Pendidikan/Inovatif).
 
-### 1. Bug nyata di Agent Reviewer & Auditor — sudah diperbaiki
-Regex deteksi SQL Injection versi sebelumnya hanya mengecek `$_GET`/`$_POST` yang
-*langsung* digabung ke query. Pola paling umum di kode siswa nyata — variabel biasa
-(`$username = $_POST[...]`) yang baru diinterpolasi ke string SQL belakangan — **lolos
-tanpa terdeteksi**, termasuk lolos pada soal SQLi bawaan `seed.sql` sendiri. Sudah
-diverifikasi lewat pengujian end-to-end: sebelum perbaikan skor keamanan kode rentan
-tersebut 100/100, sekarang 60/100 dengan temuan "Potensi SQL Injection" tercatat.
+---
 
-### 2. Hybrid Audit Trail (transparansi, bukan black-box)
-Sebelumnya: saat Groq API aktif, semua temuan murni opini AI (probabilistik).
-Sekarang: pemeriksaan keamanan deterministik (SQLi, XSS, secret hardcoded, fungsi
-berbahaya) **selalu dijalankan berdampingan** dengan AI, dan skor keamanan diberi
-*hard cap* — AI tidak bisa "melunakkan" skor padahal ada bukti pasti pelanggaran.
-Tiap temuan diberi label sumber yang tampil di UI:
-- **✓ Verified** (hijau) — ditemukan lewat pemeriksaan pola deterministik
-- **AI Judgment** — penilaian kualitatif dari Groq (Llama 3.3)
+## Fitur
 
-### 3. Agent Task Issuer sekarang transparan soal alasan rekomendasi
-`recommendedTasks()` diganti `recommend()` yang mengembalikan alasan personalisasi,
-mis. *"Direkomendasikan karena skor Keamanan kamu masih 65/100"* — ditampilkan
-langsung di dashboard siswa, bukan cuma daftar tanpa konteks.
+- **Agent Task Issuer** — merekomendasikan studi kasus, diprioritaskan pada kategori dengan
+  skor siswa paling lemah, lengkap dengan alasan personalisasi yang ditampilkan ke siswa.
+- **Agent Reviewer & Auditor** — audit otomatis berbasis **rubric per kategori**
+  (submission `code` / `design` / `network` / `general`). Untuk submission kode, pemeriksaan
+  keamanan kritikal (SQL Injection, XSS, RCE, kredensial hardcoded) berjalan **deterministik**
+  berdampingan dengan AI, sehingga skor keamanan tidak bisa "dilunakkan" oleh model bahasa —
+  tiap temuan ditandai sumbernya (✓ Verified vs AI Judgment).
+- **Agent Defense** — lapisan anti-cheat: sesi pembelaan **wajib** setelah audit, mengajukan
+  4–5 pertanyaan yang merujuk keputusan spesifik di hasil kerja siswa sendiri, untuk
+  membedakan pemahaman asli dari hasil generate AI. Skor pemahaman (`comprehension`) ikut
+  membentuk skor keseluruhan.
+- **Agent Mentor** — chatbot interaktif yang membimbing lewat *hint* bertahap, bukan jawaban
+  jadi, dengan konteks langsung dari hasil audit submission siswa.
+- **Agent Profile Generator** — mengagregasi seluruh hasil audit menjadi skor kompetensi
+  transparan, termasuk **breakdown per divisi** (per kategori studi kasus), narasi kualitatif,
+  kelebihan/kekurangan, dan badge (Pemula → Junior Ready → Job Ready → Top Talent).
+- **Activity Timeline** — setiap aksi kelima agent tercatat dan ditampilkan sebagai linimasa
+  di dashboard, jadi alur kerja multi-agent terlihat nyata, bukan klaim di atas kertas.
+- **Talent Pool untuk Mitra** — jelajahi talenta terurut skor dengan pencarian berdasarkan
+  nama/jurusan, lihat profil detail (skor per divisi, narasi, riwayat studi kasus), pratinjau
+  CV, dan lacak status rekrutmen (disimpan → dihubungi → interview → magang).
+- **Upload CV** — siswa melengkapi profil dengan CV PDF (max 5 MB), dilihat mitra lewat
+  pratinjau langsung di halaman talent detail.
+- **Indikator Mode AI** — badge transparan di setiap halaman: *Groq AI Aktif* atau
+  *Mode Heuristik Lokal*; mode yang dipakai juga dicatat per submission/sesi pembelaan.
+- **Keamanan** — proteksi CSRF (`hash_equals`) pada form berisiko: login, register, submit
+  solusi, sesi pembelaan, upload CV, toggle visibilitas profil, dan update status rekrutmen.
+  Password di-hash bcrypt, semua query memakai PDO prepared statements, upload divalidasi MIME
+  dan disimpan dengan nama acak, serta ada cek kepemilikan data (ownership) di tiap halaman.
 
-### 4. Agent Profile Generator sekarang menulis narasi untuk mitra
-Skor tetap dihitung murni dari data `ai_reviews` (bukan dikarang LLM, supaya
-dipertanggungjawabkan) — tapi sekarang Agent Profile Generator juga menulis satu
-paragraf ringkasan kualitatif (via Groq, fallback ke template deterministik jika
-AI tidak tersedia) yang tampil di halaman detail talent untuk mitra. Kolom baru:
-`skill_profiles.narrative`.
+## Tech Stack
 
-### 5. Agent Activity Timeline (fitur baru)
-Tabel `activity_logs` di skema sebelumnya sudah dirancang tapi **tidak pernah dipakai**
-di kode manapun. Sekarang setiap aksi ke-4 agent dicatat (rekomendasi tugas, audit
-selesai, balasan mentor, profil diperbarui) dan ditampilkan sebagai timeline di
-dashboard siswa maupun mitra — supaya sistem multi-agent ini terlihat benar-benar
-bekerja, bukan cuma klaim di proposal.
+| Layer | Teknologi |
+|---|---|
+| Backend | PHP 8.1+ (native, tanpa framework) |
+| Database | MySQL 8 / MariaDB 10.5+ |
+| AI | Groq API — Llama 3.3 70B (opsional, ada fallback heuristik lokal) |
+| Frontend | HTML + Tailwind (CDN) + vanilla JS |
 
-### 6. Indikator Mode AI
-Badge kecil di header ("● Groq AI Aktif" / "● Mode Heuristik Lokal") — transparansi
-jujur soal mode yang sedang aktif, konsisten di semua halaman.
+## Instalasi
 
-### 7. Keamanan: CSRF protection
-Sebelumnya tidak ada proteksi CSRF sama sekali. Ditambahkan token CSRF (session-based,
-`hash_equals` untuk mencegah timing attack) pada form login, submit kode, dan update
-status rekrutmen di portal mitra. Sudah diuji: token palsu ditolak dan tidak
-menghasilkan sesi.
+**Kebutuhan:** PHP 8.1+ dengan ekstensi `pdo_mysql`, `mbstring`, dan `curl`; MySQL 8 /
+MariaDB 10.5+.
 
-### 8. Alat Diagnosa Koneksi AI (`ai-test.php`)
-Sebelumnya, kalau panggilan ke Groq API gagal (SSL, API key salah, dsb), sistem
-diam-diam jatuh ke mode heuristik tanpa penjelasan — sangat menyulitkan debugging,
-apalagi masalah SSL certificate di XAMPP Windows yang cukup umum. Sekarang tersedia
-`ai-test.php` (perlu login) yang menjalankan satu panggilan uji nyata ke Groq dan
-menampilkan detail teknis persis: HTTP status, pesan error dari Groq, atau
-kalau masalahnya SSL certificate bawaan XAMPP — dikasih instruksi perbaikan langkah
-demi langkah. **Hapus atau lindungi file ini sebelum deploy ke publik.**
+```bash
+# 1. Clone repo
+git clone https://github.com/dravencent40-pixel/SkillSync-AI.git
+cd skillsync
 
-## Kredensial Demo (dari seed.sql)
+# 2. Import skema database
+mysql -u root -p < database/schema.sql
+mysql -u root -p skillsync_ai < database/seed.sql   # data demo (6 kategori, 6 studi kasus), opsional
+# atau pakai installer web: buka database/setup.php di browser
 
-| Role  | Email                          | Password    |
-|-------|----------------------------------|-------------|
-| Mitra | admin@goodeva.tech               | password123 |
-| Siswa | rafi@smkn9bekasi.sch.id          | password123 |
-| Siswa | sinta@smkn9bekasi.sch.id         | password123 |
+# 3. Salin & isi konfigurasi
+cp config/config.example.php config/config.php
+# edit config/config.php: DB_HOST, DB_NAME, DB_USER, DB_PASS, APP_URL,
+# dan GROQ_API_KEY bila ingin mode AI penuh aktif (gratis di https://console.groq.com/keys)
 
-## Struktur Agent
+# 4. Jalankan
+php -S localhost:8000
+# buka http://localhost:8000
+```
 
-| Agent                  | File                                              |
-|-------------------------|---------------------------------------------------|
-| Task Issuer              | `includes/agents/TaskIssuerAgent.php`             |
-| Reviewer & Auditor       | `includes/agents/ReviewerAuditorAgent.php`        |
-| Mentor                   | `includes/agents/MentorAgent.php`                 |
-| Profile Generator        | `includes/agents/ProfileGeneratorAgent.php`       |
-| Klien AI (Groq API)    | `includes/agents/AIClient.php`                    |
+> `config/config.php` sudah masuk `.gitignore` — jangan pernah commit file ini karena berisi
+> API key & kredensial database. Selalu commit `config/config.example.php` sebagai template.
 
-## Keterbatasan yang Masih Perlu Diperhatikan
+**Upgrade dari instalasi lama?** Jalankan file migrasi yang relevan di `database/` sesuai
+urutan tanggalnya: `migrate_narrative.sql`, `migrate_track_scores.sql`, `migrate_defense.sql`,
+`migrate_multitrack.sql`, `migrate_accounts_cv.sql`. Instalasi baru cukup `schema.sql`
+(sudah mencakup seluruh kolom/tabel migrasi).
 
-- CSRF belum dipasang di seluruh form (baru: login, submit kode, status rekrutmen —
-  yang paling berisiko). Form lain seperti buat task baru oleh mitra belum dilindungi.
-- `upload_cv.php` adalah form publik tanpa autentikasi — pertimbangkan rate-limiting
-  bila dipakai di produksi nyata.
-- Mode heuristik lokal (tanpa API key) tetap berbasis regex — cakupan deteksinya jauh
-  lebih sempit dibanding audit oleh Groq, ini memang dirancang sebagai *fallback*,
-  bukan pengganti penuh.
+## Kredensial Demo
+
+Tersedia setelah import `database/seed.sql` — semua password: `password123`
+
+| Role  | Email |
+|-------|-------|
+| Mitra | admin@goodeva.tech |
+| Siswa | rafi@smkn9bekasi.sch.id |
+| Siswa | sinta@smkn9bekasi.sch.id |
+
+## Alur Pengguna
+
+**Siswa:** daftar → dashboard menampilkan skor per divisi & rekomendasi task dari Agent Task
+Issuer → kerjakan studi kasus (kode/desain/jaringan sesuai kategori, bisa dengan lampiran file
+atau link eksternal) → hasil diaudit Agent Reviewer & Auditor → **selesaikan sesi pembelaan
+(Agent Defense)** → diskusi lanjut dengan Agent Mentor bila perlu → skor terakumulasi otomatis
+di Profil Skill lengkap dengan breakdown per divisi dan linimasa aktivitas. Siswa juga bisa
+mengunggah CV agar terlihat oleh mitra.
+
+**Mitra:** daftar → terbitkan studi kasus dari industri nyata → pantau submission masuk →
+jelajahi Talent Pool terurut skor (cari berdasarkan nama/jurusan) → buka profil detail siswa
+(skor per divisi, narasi, CV) → tandai status rekrutmen.
+
+## Catatan & Keterbatasan
+
+- `ai-test.php` adalah alat diagnosa koneksi ke Groq API (butuh login) — **hapus atau
+  lindungi file ini sebelum deploy ke lingkungan publik.**
+- Form "Terbitkan Studi Kasus" di `tasks.php` (mitra) belum dilindungi CSRF.
+- `upload_cv.php` adalah form ber-autentikasi tapi belum ada rate-limiting — pertimbangkan
+  ini bila dipakai di produksi nyata.
+- Mode heuristik lokal (tanpa `GROQ_API_KEY`) berbasis regex untuk kode — cakupan deteksinya
+  lebih sempit dibanding audit lewat AI; untuk submission non-kode penilaian hanya berdasar
+  kelengkapan (cap skor 70), dan skor sesi pembelaan dibatasi (cap 75). Ini memang dirancang
+  sebagai *fallback*, bukan pengganti.
+
+## Kontak
+
+Dibuat oleh **Kelompok Tekabe**
+
+- taufiqridhoo34@gmail.com
+- riwantoraihan@gmail.com

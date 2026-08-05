@@ -12,7 +12,6 @@
 --
 -- Jalankan: mysql -u root -p skillsync_ai < database/migrate_accounts_cv.sql
 -- =====================================================================
-USE skillsync_ai;
 
 ALTER TABLE student_profiles
     ADD COLUMN IF NOT EXISTS cv_path VARCHAR(255) DEFAULT NULL COMMENT 'path relatif file CV milik siswa ini' AFTER github_url,

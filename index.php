@@ -14,10 +14,6 @@ require __DIR__ . '/includes/header.php';
   <div class="max-w-7xl mx-auto px-6 pt-16 pb-20 md:pt-24 md:pb-28 relative z-10">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
       <div class="lg:col-span-7 animate-fade-up">
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent-100 mb-6" style="background: var(--accent-50);">
-          <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
-          <span class="text-xs font-semibold tracking-wider text-accent-dark">LOMBA AI AGENT INNOVATION &middot; GOODEVA</span>
-        </div>
 
         <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05]">
           <span>AI Technical Lead,</span><br>
@@ -41,7 +37,7 @@ require __DIR__ . '/includes/header.php';
 
         <div class="mt-10 flex items-center gap-6 text-sm text-[#525252]">
           <div class="flex items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
             <span><strong class="text-[#0a0a0a]">4</strong> AI Agent bekerja sama</span>
           </div>
           <div class="w-1 h-1 rounded-full bg-[#d4d4d4]"></div>
@@ -53,33 +49,57 @@ require __DIR__ . '/includes/header.php';
       </div>
 
       <div class="lg:col-span-5 animate-fade-up" style="animation-delay: 0.1s;">
-        <div class="surface spot-card p-6 rounded-3xl">
-          <div class="flex items-center justify-between mb-5">
-            <div class="flex items-center gap-2">
-              <div class="w-2 h-2 rounded-full bg-[#0a0a0a] animate-pulse"></div>
-              <p class="text-xs font-semibold uppercase tracking-wider text-[#a3a3a3]">Live Audit Preview</p>
-            </div>
-            <span class="badge badge-accent">AI Powered</span>
+  <div class="surface spot-card p-6 rounded-3xl">
+    <div class="flex items-center justify-between mb-5">
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-[#0a0a0a] animate-pulse"></div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-[#a3a3a3]">CV Biasa vs SkillSync</p>
+      </div>
+      <span class="badge badge-accent">Transparan</span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 relative">
+
+      <!-- BEFORE: CV konvensional (samar/vague) -->
+      <div class="rounded-2xl p-4" style="background:#f4f4f5; border:1px solid #e4e4e7;">
+        <p class="text-[10px] font-semibold uppercase tracking-wider mb-3" style="color:#a3a3a3;">CV Konvensional</p>
+        <div class="space-y-2.5">
+          <div class="h-2.5 rounded-full" style="background:#d4d4d8; width:90%;"></div>
+          <div class="h-2.5 rounded-full" style="background:#d4d4d8; width:70%;"></div>
+          <div class="h-2.5 rounded-full" style="background:#d4d4d8; width:80%;"></div>
+          <div class="h-2.5 rounded-full" style="background:#d4d4d8; width:55%;"></div>
+        </div>
+        <p class="text-xs italic mt-4" style="color:#a1a1aa;">"Menguasai berbagai bahasa programming, kompetensi baik."</p>
+      </div>
+
+      <!-- Arrow tengah -->
+      <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold z-10 shadow-md" style="background: var(--accent, #2563eb);">→</div>
+
+<!-- AFTER: Profil SkillSync (jelas & terukur, lintas divisi) -->
+<div class="rounded-2xl p-4" style="background: var(--accent-50, #eff6ff); border:1px solid var(--accent, #2563eb);">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-[10px] font-semibold uppercase tracking-wider" style="color: var(--accent, #2563eb);">Profil SkillSync AI</p>
+          <span class="text-lg font-bold" style="color: var(--success, #059669);">86</span>
+        </div>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs" style="color:#52525b;">Programming</span>
+            <span class="text-sm font-bold" style="color: var(--success, #059669);">88</span>
           </div>
-          <pre class="rounded-2xl text-xs p-5 overflow-x-auto leading-relaxed" style="background: #0a0a0a; color: #e5e5e5;"><span style="color: #6b7280;">// login.php</span>
-<span style="color: #c084fc;">$query</span> = <span style="color: #86efac;">"SELECT * FROM users WHERE u='$u'"</span>;
-<span style="color: #f87171;">// ⚠ Agent Reviewer menandai baris ini</span></pre>
-          <div class="mt-5 grid grid-cols-3 gap-3">
-            <div class="text-center p-3 rounded-xl border" style="background: var(--danger-50); border-color: #fecaca;">
-              <p class="text-lg font-bold" style="color: var(--danger);">42</p>
-              <p class="text-[10px] font-medium mt-0.5" style="color: #b91c1c;">Keamanan</p>
-            </div>
-            <div class="text-center p-3 rounded-xl border" style="background: var(--warning-50); border-color: #fde68a;">
-              <p class="text-lg font-bold" style="color: var(--warning);">78</p>
-              <p class="text-[10px] font-medium mt-0.5" style="color: #92400e;">Clean Code</p>
-            </div>
-            <div class="text-center p-3 rounded-xl border" style="background: var(--success-50); border-color: #a7f3d0;">
-              <p class="text-lg font-bold" style="color: var(--success);">85</p>
-              <p class="text-[10px] font-medium mt-0.5" style="color: #047857;">Efisiensi</p>
-            </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs" style="color:#52525b;">UI/UX Design</span>
+            <span class="text-sm font-bold" style="color: var(--success, #059669);">82</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs" style="color:#52525b;">Jaringan & Infrastruktur</span>
+            <span class="text-sm font-bold" style="color: var(--warning, #d97706);">79</span>
           </div>
         </div>
+        <span class="inline-block mt-4 text-[10px] font-bold px-2.5 py-1 rounded-full text-white" style="background: var(--success, #059669);">Job Ready</span>
       </div>
+    </div>
+  </div>
+</div>
     </div>
   </div>
 </section>
@@ -95,10 +115,10 @@ require __DIR__ . '/includes/header.php';
   <div class="grid grid-cols-1 md:grid-cols-2 gap-5 stagger">
     <?php
     $agents = [
-        ['01', 'Agent Task Issuer', 'Mengeluarkan studi kasus & kodingan riil dari industri, dipersonalisasi berdasarkan kategori terlemah tiap siswa.', 'M16 11V7a4 4 0 0 0-8 0v4M5 9h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1z', '#2563eb', '#eff6ff'],
-        ['02', 'Agent Reviewer & Auditor', 'Menilai source code secara otomatis: clean code, keamanan (SQLi/XSS), dan efisiensi (N+1 query, kompleksitas).', 'M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z', '#059669', '#ecfdf5'],
-        ['03', 'Agent Mentor', 'Chatbot interaktif yang membimbing perbaikan bug dengan hint bertahap, bukan sekadar jawaban jadi.', 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 0 1-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', '#d97706', '#fffbeb'],
-        ['04', 'Agent Profile Generator', 'Mengagregasi seluruh hasil audit menjadi skor kompetensi transparan, siap direkomendasikan ke mitra.', 'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z', '#e11d48', '#fff1f2'],
+        ['01', 'Agent Reviewer & Auditor', 'Menilai studi kasus yang dikerjakan secara otomatis.', 'M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z', '#059669', '#ecfdf5'],
+        ['02', 'Agent Mentor', 'Chatbot interaktif yang membimbing perbaikan bug dengan hint bertahap, bukan sekadar jawaban jadi.', 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 0 1-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', '#d97706', '#fffbeb'],
+        ['03', 'Agent Defense', 'Menguji pemahaman siswa lewat pertanyaan yang merujuk langsung ke hasil kerjanya sendiri, sebagai mitigasi kecurangan.', 'M9.09 9a3 3 0 1 1 5.83 1c0 2-3 3-3 3m.01 4h.01M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', '#7c3aed', '#f5f3ff'],
+        ['04', 'Agent Profile Generator', 'Merangkum seluruh hasil studi kasus yang sudah dikerjakan menjadi profile yang bisa dilihat oleh mitra industri.', 'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z', '#e11d48', '#fff1f2'],
     ];
     foreach ($agents as $i => $a): ?>
     <div class="surface surface-hover spot-card p-7 rounded-2xl group">
@@ -130,7 +150,7 @@ require __DIR__ . '/includes/header.php';
       <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-white">Mengapa SkillSync AI?</h2>
       <p class="mt-3 text-sm text-neutral-400 max-w-md mx-auto">Solusi asesmen teknis yang transparan, efisien, dan terhubung langsung dengan industri.</p>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 stagger">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 stagger">   
       <div class="p-7 rounded-2xl border border-white/10" style="background: rgba(255,255,255,0.08);">
         <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background: rgba(255,255,255,0.1);">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>

@@ -1,8 +1,8 @@
 -- =====================================================================
 -- SkillSync AI — Seed Data (opsional, untuk demo)
--- Jalankan setelah schema.sql
+-- Jalankan setelah schema.sql. Pilih database yang sesuai di phpMyAdmin
+-- dulu sebelum import file ini — jangan pakai baris USE.
 -- =====================================================================
-USE skillsync_ai;
 
 INSERT INTO task_categories (name, slug, submission_type, rubric_criteria) VALUES
 ('Web Development', 'web-development', 'code', JSON_ARRAY(

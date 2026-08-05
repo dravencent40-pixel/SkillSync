@@ -6,7 +6,6 @@
 --
 -- Jalankan: mysql -u root -p skillsync_ai < database/migrate_narrative.sql
 -- =====================================================================
-USE skillsync_ai;
 
 ALTER TABLE skill_profiles
     ADD COLUMN IF NOT EXISTS narrative TEXT DEFAULT NULL

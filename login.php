@@ -44,7 +44,7 @@ require __DIR__ . '/includes/header.php';
         <div class="blob" style="width: 250px; height: 250px; top: -80px; right: -50px; background: rgba(255,255,255,0.08);"></div>
         <div class="relative z-10">
           <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-8" style="background: rgba(255,255,255,0.1); box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
           </div>
           <h2 class="text-2xl font-bold text-white leading-tight">SkillSync <span class="text-neutral-400">AI</span></h2>
           <p class="mt-3 text-sm text-neutral-400 leading-relaxed max-w-[30ch]">Platform asesmen teknis berbasis AI untuk siswa SMK dan mitra industri.</p>
@@ -76,7 +76,7 @@ require __DIR__ . '/includes/header.php';
       <div class="w-full max-w-md mx-auto">
         <div class="lg:hidden flex items-center gap-3 mb-8">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold" style="background: var(--gradient-dark); box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
           </div>
           <span class="font-bold text-xl">SkillSync <span class="text-neutral-500">AI</span></span>
         </div>

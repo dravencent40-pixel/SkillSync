@@ -6,7 +6,6 @@
 --
 -- Jalankan: mysql -u root -p skillsync_ai < database/migrate_defense.sql
 -- =====================================================================
-USE skillsync_ai;
 
 -- Skor pemahaman rata-rata siswa, ikut membentuk overall_score di Profile Generator.
 ALTER TABLE skill_profiles

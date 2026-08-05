@@ -8,7 +8,6 @@
 --
 -- Jalankan: mysql -u root -p skillsync_ai < database/migrate_multitrack.sql
 -- =====================================================================
-USE skillsync_ai;
 
 -- ---------------------------------------------------------------------
 -- 1. task_categories — tandai tipe submission & kriteria rubric per divisi.

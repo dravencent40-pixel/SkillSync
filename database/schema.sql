@@ -2,11 +2,12 @@
 -- SkillSync AI — Database Schema (MySQL 8+/MariaDB 10.5+)
 -- AI Technical Project Lead & Assessment Agent untuk SMK/Perusahaan Tech
 -- =====================================================================
--- Import: mysql -u root -p skillsync_ai < schema.sql
+-- Import: mysql -u root -p nama_database_kamu < schema.sql
+-- ATAU lewat phpMyAdmin: pilih database yang SUDAH ADA di sidebar dulu,
+-- baru tab Import → pilih file ini. Tidak perlu CREATE DATABASE/USE
+-- karena di shared hosting, database sudah dibuat lewat cPanel dan user
+-- biasanya tidak punya izin CREATE DATABASE sendiri.
 -- =====================================================================
-
-CREATE DATABASE IF NOT EXISTS skillsync_ai CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE skillsync_ai;
 
 -- ---------------------------------------------------------------------
 -- 1. USERS — akun inti, dua peran: siswa (talent) & mitra (perusahaan/sekolah)

@@ -29,7 +29,7 @@ if (!$isCLI) {
     echo '.card{background:#1e293b;padding:1.5rem;border-radius:1rem;margin:1rem 0;border:1px solid #334155;}';
     echo 'code{background:#334155;padding:2px 6px;border-radius:4px;font-size:0.9em;}';
     echo '</style></head><body>';
-    echo '<div class="title">⚡ SkillSync AI — Database Setup</div>';
+    echo '<div class="title">◎ SkillSync AI — Database Setup</div>';
 }
 
 out("", $isCLI);
