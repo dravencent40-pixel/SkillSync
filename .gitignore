@@ -12,3 +12,5 @@ uploads/cvs/*
 Thumbs.db
 uploads/submissions/*
 !uploads/submissions/.gitkeep
+.opencode
+.agents
