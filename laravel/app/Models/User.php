@@ -2,31 +2,52 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $fillable = [
+        'name',
+        'email',
+        'password_hash',
+        'role',
+        'avatar_initial',
+        'is_active',
+    ];
+
+    protected $hidden = [
+        'password_hash',
+        'remember_token',
+    ];
+
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Kolom password di tabel legacy bernama `password_hash`,
+     * bukan `password` — Laravel Auth dipetakan lewat method ini.
      */
-    protected function casts(): array
+    public function getAuthPassword(): string
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->password_hash;
+    }
+
+    public function studentProfile(): HasOne
+    {
+        return $this->hasOne(StudentProfile::class);
+    }
+
+    public function companyProfile(): HasOne
+    {
+        return $this->hasOne(CompanyProfile::class);
+    }
+
+    public function skillProfile(): HasOne
+    {
+        return $this->hasOne(SkillProfile::class);
     }
 }
