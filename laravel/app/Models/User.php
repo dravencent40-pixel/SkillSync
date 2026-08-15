@@ -36,6 +36,12 @@ class User extends Authenticatable
         return $this->password_hash;
     }
 
+    /** Arahkan rehash password (Laravel otomatis) ke kolom legacy. */
+    public function getAuthPasswordName(): string
+    {
+        return 'password_hash';
+    }
+
     public function studentProfile(): HasOne
     {
         return $this->hasOne(StudentProfile::class);

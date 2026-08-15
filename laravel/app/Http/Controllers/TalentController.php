@@ -38,7 +38,7 @@ class TalentController extends Controller
         ]);
     }
 
-    public function show(Request $request, StudentProfile $student): Response
+    public function show(Request $request, StudentProfile $student): Response|RedirectResponse
     {
         $user = $request->user();
 

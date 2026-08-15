@@ -75,7 +75,7 @@ class CvController extends Controller
         return redirect()->route('cv.create');
     }
 
-    public function view(Request $request): BinaryFileResponse|Response
+    public function view(Request $request): BinaryFileResponse|Response|RedirectResponse
     {
         $user = Auth::user();
 

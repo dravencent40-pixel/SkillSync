@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Submission;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -10,7 +11,7 @@ use Inertia\Response;
 
 class SubmissionController extends Controller
 {
-    public function show(Request $request, Submission $submission): Response
+    public function show(Request $request, Submission $submission): Response|RedirectResponse
     {
         $user = Auth::user();
 

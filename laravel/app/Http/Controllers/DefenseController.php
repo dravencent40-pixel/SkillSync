@@ -15,7 +15,7 @@ use Inertia\Response;
 
 class DefenseController extends Controller
 {
-    public function show(Request $request, Submission $submission): Response
+    public function show(Request $request, Submission $submission): Response|RedirectResponse
     {
         $user = Auth::user();
 

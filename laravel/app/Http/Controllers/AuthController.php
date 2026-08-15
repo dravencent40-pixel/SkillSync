@@ -17,7 +17,7 @@ use Inertia\Response;
 
 class AuthController extends Controller
 {
-    public function login(): Response
+    public function login(): Response|RedirectResponse
     {
         if (Auth::check()) {
             return Inertia::location(route('dashboard'));
@@ -46,7 +46,7 @@ class AuthController extends Controller
         return redirect()->intended(route('dashboard'));
     }
 
-    public function register(): Response
+    public function register(): Response|RedirectResponse
     {
         if (Auth::check()) {
             return Inertia::location(route('dashboard'));

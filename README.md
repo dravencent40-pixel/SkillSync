@@ -6,12 +6,15 @@ SkillSync mengotomatisasi tiga hal yang biasanya makan waktu guru pembimbing dan
 rekrutmen: memberi studi kasus yang relevan, mengaudit kode siswa secara objektif, dan
 menyaring talenta lewat skor kompetensi yang transparan — bukan cuma CV.
 
-Dibangun dengan **PHP native (tanpa framework)** + **MySQL**, terintegrasi dengan **Groq API
+Dibangun dengan **Laravel 12 + Inertia + React 19** + **MySQL**, terintegrasi dengan **Groq API
 (Llama 3.3 70B)** untuk kecerdasan agent, dengan **fallback heuristik lokal** sehingga tetap
 berjalan penuh tanpa API key maupun koneksi internet.
 
 > Proyek ini dikembangkan oleh **Kelompok Tekabe** untuk Lomba AI Agent Innovation — Goodeva
 > Technology (Kategori Pendidikan/Inovatif).
+>
+> Versi asli dengan **PHP native** (tanpa framework) masih tersedia di root repository sebagai
+> referensi; aplikasi aktif kini berada di folder `laravel/`.
 
 ---
 
@@ -44,45 +47,54 @@ berjalan penuh tanpa API key maupun koneksi internet.
 
 | Layer | Teknologi |
 |---|---|
-| Backend | PHP 8.1+ (native, tanpa framework) |
+| Backend | Laravel 12 (PHP 8.2+) |
+| Frontend | Inertia.js + React 19 + Tailwind CSS (Vite) |
 | Database | MySQL 8 / MariaDB 10.5+ |
 | AI | Groq API — Llama 3.3 70B (opsional, ada fallback heuristik lokal) |
-| Frontend | HTML + Tailwind (CDN) + vanilla JS |
 
 ## Instalasi
 
-**Kebutuhan:** PHP 8.1+ dengan ekstensi `pdo_mysql` dan `mbstring`, MySQL 8 / MariaDB 10.5+.
+**Kebutuhan:** PHP 8.2+ (ekstensi `pdo_mysql`, `mbstring`, `curl`), Composer, Node.js 20+,
+MySQL 8 / MariaDB 10.5+.
 
 ```bash
 # 1. Clone repo
 git clone https://github.com/dravencent40-pixel/SkillSync.git
-cd skillsync
+cd skillsync/laravel
 
-# 2. Import skema database
-mysql -u root -p < database/schema.sql
-mysql -u root -p skillsync < database/seed.sql   # data demo, opsional
-# atau pakai installer web: buka database/setup.php di browser
+# 2. Import skema + data demo database (tabel MySQL dengan isi contoh)
+mysql -u root -p < ../database/schema.sql
+mysql -u root -p < ../database/seed_demo_data.sql   # jika tersedia, opsional
+# atau dari root: buka database/setup.php lalu database/seed_demo.php di browser
 
-# 3. Salin & isi konfigurasi
-cp config/config.example.php config/config.php
-# edit config/config.php: DB_HOST, DB_NAME, DB_USER, DB_PASS, APP_URL,
-# dan GROQ_API_KEY bila ingin mode AI penuh aktif (gratis di https://console.groq.com/keys)
+# 3. Konfigurasi
+composer install
+copy .env.example .env
+# edit .env: DB_DATABASE, DB_USERNAME, DB_PASSWORD, dan GROQ_API_KEY bila ingin
+# mode AI penuh aktif (gratis di https://console.groq.com/keys)
 
-# 4. Jalankan
-php -S localhost:8000
+# 4. Bangun aset frontend
+npm install
+npm run build        # produksi — atau `npm run dev` saat pengembangan
+
+# 5. Jalankan
+php artisan key:generate
+php artisan serve
 # buka http://localhost:8000
 ```
 
-> `config/config.php` sudah masuk `.gitignore` — jangan pernah commit file ini karena berisi
-> API key & kredensial database. Selalu commit `config/config.example.php` sebagai template.
+> `.env` berisi API key & kredensial database dan sudah masuk `.gitignore` — jangan pernah
+> commit. Selalu commit `.env.example` sebagai template.
 
-**Upgrade dari instalasi lama?** Jalankan file migrasi yang relevan di `database/` sesuai
-urutan tanggalnya (`migrate_narrative.sql`, `migrate_track_scores.sql`, `migrate_defense.sql`,
-`migrate_multitrack.sql`, `migrate_accounts_cv.sql`).
+**Struktur penting di folder `laravel/`:**
+- `app/Http/Controllers/` — controller Inertia (render React page)
+- `app/Services/Agents/` — enam agent AI (AIClient, TaskIssuer, Reviewer, Mentor, Defense, ProfileGenerator)
+- `resources/js/Pages/` — halaman React per route
+- `routes/web.php` — seluruh route aplikasi
 
 ## Kredensial Demo
 
-Tersedia setelah import `database/seed.sql` — semua password: `password123`
+Tersedia setelah import `database/schema.sql` + seed data demo — semua password: `password123`
 
 | Role  | Email |
 |-------|-------|
@@ -103,14 +115,14 @@ rekrutmen.
 
 ## Catatan & Keterbatasan
 
-- `ai-test.php` adalah alat diagnosa koneksi ke Groq API (butuh login) — **hapus atau
+- `ai-test.php` (root) adalah alat diagnosa koneksi ke Groq API versi legacy — **hapus atau
   lindungi file ini sebelum deploy ke lingkungan publik.**
-- Proteksi CSRF baru dipasang pada form berisiko tinggi (login, submit kode, status
-  rekrutmen); form lain seperti pembuatan task baru oleh mitra belum dilindungi.
-- `upload_cv.php` adalah form ber-autentikasi tapi belum ada rate-limiting — pertimbangkan
-  ini bila dipakai di produksi nyata.
+- Kolom password memakai `password_hash` (skema legacy); Laravel Auth sudah dipetakan lewat
+  `getAuthPassword()`/`getAuthPasswordName()` di `App\Models\User`.
 - Mode heuristik lokal (tanpa `GROQ_API_KEY`) berbasis regex — cakupan deteksinya lebih
   sempit dibanding audit lewat AI. Ini memang dirancang sebagai *fallback*, bukan pengganti.
+- Halaman mitra (Talent Pool) & panel siswa memakai route yang diproteksi middleware `role:`.
+- Jika `php artisan serve` dipakai untuk CV: file PDF disajikan dari `laravel/public/uploads/cvs`.
 
 ## Kontak
 

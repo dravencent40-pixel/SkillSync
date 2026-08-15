@@ -71,15 +71,15 @@ class TaskController extends Controller
         $pdo->prepare('INSERT INTO tasks (category_id, created_by, title, slug, industry_context, case_brief, starter_code, difficulty)
                         VALUES (?,?,?,?,?,?,?,?)')
             ->execute([
-                $data['category_id'], $user->id, $data['title'], $slug, $data['industry_context'] ?: null,
-                $data['case_brief'], $data['starter_code'] ?: null, $data['difficulty'],
+                $data['category_id'], $user->id, $data['title'], $slug, $data['industry_context'] ?? null,
+                $data['case_brief'], $data['starter_code'] ?? null, $data['difficulty'],
             ]);
 
         session()->flash('success', 'Studi kasus baru berhasil diterbitkan oleh Agent Task Issuer.');
         return redirect()->route('tasks');
     }
 
-    public function show(Request $request, Task $task): Response
+    public function show(Request $request, Task $task): Response|RedirectResponse
     {
         $user = Auth::user();
 
