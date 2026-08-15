@@ -1,9 +1,42 @@
 @import 'tailwindcss';
+@import './skillsync.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+/*
+ * Design tokens untuk utility class Tailwind (bg-accent, text-muted, font-mono, ...).
+ * Nilai warna sama persis dengan CSS variables di skillsync.css, supaya utility
+ * class dan var(--...) bisa dipakai berdampingan.
+ */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Outfit', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+    --color-paper: #f7f6f2;
+    --color-paper-soft: #f0efe9;
+    --color-surface: #ffffff;
+
+    --color-ink: #1b1a16;
+    --color-ink-light: #2b2a24;
+    --color-muted: #5f5e56;
+    --color-muted-light: #8b897f;
+    --color-faint: #b4b2a7;
+
+    --color-border: #e7e5dd;
+    --color-border-light: #f0eee7;
+    --color-border-strong: #d6d4c9;
+
+    --color-accent: #167a56;
+    --color-accent-dark: #0e5c40;
+    --color-accent-deep: #0a4731;
+    --color-accent-light: #1f9c6e;
+    --color-accent-50: #eef7f2;
+    --color-accent-100: #d9efe2;
+    --color-accent-200: #b5dfc7;
+
+    --color-danger: #c1382f;
+    --color-danger-50: #fbefed;
+    --color-warning: #b45309;
+    --color-warning-50: #fdf3e3;
 }
