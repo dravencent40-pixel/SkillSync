@@ -1,16 +1,36 @@
-# Konfigurasi berisi API key & kredensial DB — JANGAN pernah di-commit
-config/config.php
+# Konfigurasi & rahasia — JANGAN pernah di-commit
+.env
+.env.backup
+.env.production
 
-# Upload user (CV dsb) — data pribadi, tidak perlu masuk repo
-uploads/cvs/*
-!uploads/cvs/.gitkeep
+# Dependensi
+/node_modules
+/vendor
+
+# Aset build & upload runtime
+/public/build
+/public/hot
+/public/storage
+/public/uploads
+/public/fonts-manifest.dev.json
+
+# Tooling lokal (bukan bagian aplikasi)
+.opencode
+.agents
 
 # File lokal umum
 *.log
-.env
 .DS_Store
 Thumbs.db
-uploads/submissions/*
-!uploads/submissions/.gitkeep
-.opencode
-.agents
+.phpunit.result.cache
+.phpactor.json
+/auth.json
+Homestead.json
+Homestead.yaml
+/.codex
+/.cursor/
+/.idea
+/.nova
+/.vscode
+/.zed
+_ide_helper.php

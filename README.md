@@ -12,9 +12,6 @@ berjalan penuh tanpa API key maupun koneksi internet.
 
 > Proyek ini dikembangkan oleh **Kelompok Tekabe** untuk Lomba AI Agent Innovation — Goodeva
 > Technology (Kategori Pendidikan/Inovatif).
->
-> Versi asli dengan **PHP native** (tanpa framework) masih tersedia di root repository sebagai
-> referensi; aplikasi aktif kini berada di folder `laravel/`.
 
 ---
 
@@ -59,25 +56,20 @@ MySQL 8 / MariaDB 10.5+.
 
 ```bash
 # 1. Clone repo
-git clone https://github.com/dravencent40-pixel/SkillSync.git
-cd skillsync/laravel
+git clone https://github.com/dravencent40-pixel/SkillSync-AI.git
+cd skillsync
 
-# 2. Import skema + data demo database (tabel MySQL dengan isi contoh)
-mysql -u root -p < ../database/schema.sql
-mysql -u root -p < ../database/seed_demo_data.sql   # jika tersedia, opsional
-# atau dari root: buka database/setup.php lalu database/seed_demo.php di browser
-
-# 3. Konfigurasi
+# 2. Konfigurasi
 composer install
 copy .env.example .env
 # edit .env: DB_DATABASE, DB_USERNAME, DB_PASSWORD, dan GROQ_API_KEY bila ingin
 # mode AI penuh aktif (gratis di https://console.groq.com/keys)
 
-# 4. Bangun aset frontend
+# 3. Bangun aset frontend
 npm install
 npm run build        # produksi — atau `npm run dev` saat pengembangan
 
-# 5. Jalankan
+# 4. Jalankan
 php artisan key:generate
 php artisan serve
 # buka http://localhost:8000
@@ -86,21 +78,11 @@ php artisan serve
 > `.env` berisi API key & kredensial database dan sudah masuk `.gitignore` — jangan pernah
 > commit. Selalu commit `.env.example` sebagai template.
 
-**Struktur penting di folder `laravel/`:**
+**Struktur penting:**
 - `app/Http/Controllers/` — controller Inertia (render React page)
 - `app/Services/Agents/` — enam agent AI (AIClient, TaskIssuer, Reviewer, Mentor, Defense, ProfileGenerator)
 - `resources/js/Pages/` — halaman React per route
 - `routes/web.php` — seluruh route aplikasi
-
-## Kredensial Demo
-
-Tersedia setelah import `database/schema.sql` + seed data demo — semua password: `password123`
-
-| Role  | Email |
-|-------|-------|
-| Mitra | admin@goodeva.tech |
-| Siswa | rafi@smkn9bekasi.sch.id |
-| Siswa | sinta@smkn9bekasi.sch.id |
 
 ## Alur Pengguna
 
@@ -115,14 +97,15 @@ rekrutmen.
 
 ## Catatan & Keterbatasan
 
-- `ai-test.php` (root) adalah alat diagnosa koneksi ke Groq API versi legacy — **hapus atau
-  lindungi file ini sebelum deploy ke lingkungan publik.**
+- Skema database tidak disertakan di repository ini (diimpor langsung dari sistem lama);
+  untuk menjalankan aplikasi, buat database MySQL (default: `skillsync`) dan isi konfigurasi
+  di `.env`. Sebaiknya ditambahkan Laravel migration + seeder ke depan.
 - Kolom password memakai `password_hash` (skema legacy); Laravel Auth sudah dipetakan lewat
   `getAuthPassword()`/`getAuthPasswordName()` di `App\Models\User`.
 - Mode heuristik lokal (tanpa `GROQ_API_KEY`) berbasis regex — cakupan deteksinya lebih
   sempit dibanding audit lewat AI. Ini memang dirancang sebagai *fallback*, bukan pengganti.
 - Halaman mitra (Talent Pool) & panel siswa memakai route yang diproteksi middleware `role:`.
-- Jika `php artisan serve` dipakai untuk CV: file PDF disajikan dari `laravel/public/uploads/cvs`.
+- Jika `php artisan serve` dipakai untuk CV: file PDF disajikan dari `public/uploads/cvs`.
 
 ## Kontak
 
