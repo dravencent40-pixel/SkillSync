@@ -16,8 +16,11 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password_hash');
             $table->rememberToken();
+            $table->enum('role', ['siswa', 'mitra'])->default('siswa');
+            $table->string('avatar_initial', 2)->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
 

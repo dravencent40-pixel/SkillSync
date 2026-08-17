@@ -15,6 +15,12 @@ berjalan penuh tanpa API key maupun koneksi internet.
 
 ---
 
+## Demo
+
+<!-- Ganti URL di bawah dengan screenshot/gif atau link live demo yang sudah di-deploy -->
+![Dashboard Siswa](docs/screenshot-dashboard.png)
+![Talent Pool Mitra](docs/screenshot-talent.png)
+
 ## Fitur
 
 - **Agent Task Issuer** — merekomendasikan studi kasus, diprioritaskan pada kategori dengan
@@ -48,6 +54,7 @@ berjalan penuh tanpa API key maupun koneksi internet.
 | Frontend | Inertia.js + React 19 + Tailwind CSS (Vite) |
 | Database | MySQL 8 / MariaDB 10.5+ |
 | AI | Groq API — Llama 3.3 70B (opsional, ada fallback heuristik lokal) |
+| License | MIT |
 
 ## Instalasi
 
@@ -62,15 +69,18 @@ cd skillsync
 # 2. Konfigurasi
 composer install
 copy .env.example .env
+php artisan key:generate
 # edit .env: DB_DATABASE, DB_USERNAME, DB_PASSWORD, dan GROQ_API_KEY bila ingin
 # mode AI penuh aktif (gratis di https://console.groq.com/keys)
 
-# 3. Bangun aset frontend
+# 3. Siapkan database
+php artisan migrate --seed
+
+# 4. Bangun aset frontend
 npm install
 npm run build        # produksi — atau `npm run dev` saat pengembangan
 
-# 4. Jalankan
-php artisan key:generate
+# 5. Jalankan
 php artisan serve
 # buka http://localhost:8000
 ```
@@ -95,17 +105,24 @@ di Profil Skill, lengkap dengan linimasa aktivitas.
 jelajahi Talent Pool terurut skor → buka profil detail siswa (termasuk CV) → tandai status
 rekrutmen.
 
+## Kredensial Demo
+
+Tersedia setelah `php artisan migrate --seed` — semua password: `password123`
+
+| Role  | Email |
+|-------|-------|
+| Mitra | admin@goodeva.tech |
+| Siswa | rafi@smkn9bekasi.sch.id |
+| Siswa | sinta@smkn9bekasi.sch.id |
+
 ## Catatan & Keterbatasan
 
-- Skema database tidak disertakan di repository ini (diimpor langsung dari sistem lama);
-  untuk menjalankan aplikasi, buat database MySQL (default: `skillsync`) dan isi konfigurasi
-  di `.env`. Sebaiknya ditambahkan Laravel migration + seeder ke depan.
-- Kolom password memakai `password_hash` (skema legacy); Laravel Auth sudah dipetakan lewat
+- Kolom password memakai `password_hash` (bukan `password`); Laravel Auth sudah dipetakan lewat
   `getAuthPassword()`/`getAuthPasswordName()` di `App\Models\User`.
 - Mode heuristik lokal (tanpa `GROQ_API_KEY`) berbasis regex — cakupan deteksinya lebih
   sempit dibanding audit lewat AI. Ini memang dirancang sebagai *fallback*, bukan pengganti.
 - Halaman mitra (Talent Pool) & panel siswa memakai route yang diproteksi middleware `role:`.
-- Jika `php artisan serve` dipakai untuk CV: file PDF disajikan dari `public/uploads/cvs`.
+- File CV di-upload ke `public/uploads/cvs` (sudah masuk `.gitignore`).
 
 ## Kontak
 
