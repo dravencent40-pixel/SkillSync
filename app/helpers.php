@@ -31,8 +31,9 @@ if (!function_exists('log_activity')) {
     function log_activity(?int $userId, string $action, ?string $meta = null): void
     {
         try {
+            $jsonMeta = $meta !== null ? json_encode(['info' => $meta]) : null;
             db()->prepare('INSERT INTO activity_logs (user_id, action, meta) VALUES (?, ?, ?)')
-                ->execute([$userId, $action, $meta]);
+                ->execute([$userId, $action, $jsonMeta]);
         } catch (\Throwable $e) {
             report($e);
         }
